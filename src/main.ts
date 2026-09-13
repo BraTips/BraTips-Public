@@ -1,0 +1,2 @@
+import {createApp} from 'vue'; import {createPinia} from 'pinia'; import router from './router'; import {useAuth} from './stores/auth'; import App from './App.vue'; import './style.css';
+const app=createApp(App);app.use(createPinia());app.use(router);const auth=useAuth();auth.load().finally(()=>app.mount('#app'));router.beforeEach(async(to)=>{if(to.meta.auth&&!auth.isLoggedIn)return {path:'/login',query:{redirect:to.fullPath}}});
