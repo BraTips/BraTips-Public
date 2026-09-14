@@ -1,7 +1,7 @@
-# BraTips public product design
+# BraTipsters public product design
 
 ## Experience
-- Dark navy + BraTips pink visual system from the existing admin logo.
+- Dark navy + BraTipsters pink visual system from the existing admin logo.
 - Public-first navigation: users can browse picks, tipsters, Bet of the Day and the track record without logging in.
 - Authentication gate only appears when a user tries to play/add a pick or access account tools.
 - Mobile responsive cards and tables.

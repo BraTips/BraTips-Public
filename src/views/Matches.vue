@@ -35,8 +35,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import {onMounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';
+import {onMounted,onUnmounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';
 const tabs=[{v:'today',l:'Today',icon:'◷'},{v:'live',l:'Live',icon:'●'},{v:'scheduled',l:'Upcoming',icon:'→'},{v:'finished',l:'Results',icon:'✓'}];const tab=ref('today'),matches=ref<any[]>([]),loading=ref(true),error=ref('');
 const time=(v:string)=>v?new Date(v).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';const dateLabel=(v:string)=>v?new Date(v).toLocaleDateString([],{weekday:'short',day:'2-digit',month:'short'}):'';
-async function load(){loading.value=true;error.value='';try{const d=tab.value==='today'?await api.get('/matches/today'):tab.value==='live'?await api.get('/matches/live'):await api.get(`/matches?status=${tab.value}&limit=100`);matches.value=d.data||[]}catch(e:any){error.value=e?.message||'Unable to load football matches.'}finally{loading.value=false}}watch(tab,load);onMounted(load);
+let refreshTimer:number|undefined;
+function startPolling(){if(refreshTimer)window.clearInterval(refreshTimer);const ms=tab.value==='live'?15000:tab.value==='today'?60000:300000;refreshTimer=window.setInterval(load,ms)}
+async function load(){loading.value=matches.value.length===0;error.value='';try{const d=tab.value==='today'?await api.get('/matches/today'):tab.value==='live'?await api.get('/matches/live'):await api.get(`/matches?status=${tab.value}&limit=100`);matches.value=d.data||[]}catch(e:any){if(!matches.value.length)error.value=e?.message||'Unable to load football matches.'}finally{loading.value=false}}
+watch(tab,async()=>{await load();startPolling()});onMounted(async()=>{await load();startPolling()});onUnmounted(()=>{if(refreshTimer)window.clearInterval(refreshTimer)});
 </script>

@@ -7,7 +7,7 @@
       <div v-if="loading" class="grid3"><div v-for="n in 6" :key="n" class="tip-skeleton"></div></div>
       <div v-else-if="error" class="pro-panel error">{{error}} <button class="ghost" @click="load">Try again</button></div>
       <div v-else class="grid3"><PickCard v-for="p in filtered" :key="p._id" :pick="p" @play="play"/><div v-if="!filtered.length" class="pro-panel empty">No published predictions match your filters.</div></div>
-      <section class="premium-research"><div class="premium-icon">★</div><div><span class="eyebrow">Premium research</span><h2>Go deeper than the pick</h2><p>Unlock the full BraTips research experience, market context and premium prediction content.</p></div><RouterLink to="/subscription" class="btn">Explore Premium</RouterLink></section>
+      <section class="premium-research"><div class="premium-icon">★</div><div><span class="eyebrow">Premium research</span><h2>Go deeper than the pick</h2><p>Unlock the full BraTipsters research experience, market context and premium prediction content.</p></div><RouterLink to="/subscription" class="btn">Explore Premium</RouterLink></section>
     </div>
   </div>
 </template>

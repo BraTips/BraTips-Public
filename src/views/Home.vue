@@ -2,7 +2,7 @@
   <div class="pro-home page-animate">
     <section class="home-shell wrap">
       <aside class="home-sidebar">
-        <div class="side-title">BraTips</div>
+        <div class="side-title">BraTipsters</div>
         <RouterLink class="side-item active" to="/picks"><span>▣</span> Featured Tips</RouterLink>
         <RouterLink class="side-item" to="/dropping-odds"><span>↓</span> Dropping Odds <b>{{ dropCount }}</b></RouterLink>
         <RouterLink class="side-item" to="/matches"><span>◉</span> Matches & Odds <b>{{ matches.length }}</b></RouterLink>
@@ -70,9 +70,9 @@
 
         <section class="tool-grid">
           <RouterLink to="/dropping-odds" class="tool-card drop-tool"><span class="tool-icon">↓</span><div><small>Market signal</small><h3>Dropping Odds</h3><p>Find selections whose prices are moving lower.</p></div><b>→</b></RouterLink>
-          <RouterLink to="/bet-of-the-day" class="tool-card"><span class="tool-icon">✦</span><div><small>Daily feature</small><h3>Bet of the Day</h3><p>Follow today's highlighted BraTips selections.</p></div><b>→</b></RouterLink>
+          <RouterLink to="/bet-of-the-day" class="tool-card"><span class="tool-icon">✦</span><div><small>Daily feature</small><h3>Bet of the Day</h3><p>Follow today's highlighted BraTipsters selections.</p></div><b>→</b></RouterLink>
           <RouterLink to="/history" class="tool-card"><span class="tool-icon">↗</span><div><small>Track record</small><h3>Prediction History</h3><p>See settled picks and the public record.</p></div><b>→</b></RouterLink>
-          <RouterLink to="/subscription" class="tool-card premium-tool"><span class="tool-icon">★</span><div><small>Premium</small><h3>Unlock BraTips</h3><p>Access deeper market and prediction research.</p></div><b>→</b></RouterLink>
+          <RouterLink to="/subscription" class="tool-card premium-tool"><span class="tool-icon">★</span><div><small>Premium</small><h3>Unlock BraTipsters</h3><p>Access deeper market and prediction research.</p></div><b>→</b></RouterLink>
         </section>
       </main>
 

@@ -56,11 +56,11 @@
           </div>
 
           <div class="mc-panel">
-            <div class="mc-panel-head"><div><span class="eyebrow">BraTips insight</span><h2>Predictions</h2></div></div>
+            <div class="mc-panel-head"><div><span class="eyebrow">BraTipsters insight</span><h2>Predictions</h2></div></div>
             <RouterLink v-for="p in predictions" :key="p._id" :to="predictionPath(p._id)" class="tip-row">
-              <div><b>{{ p.prediction }}</b><span>{{ p.tipsterId?.name || 'BraTips tipster' }}</span></div><strong>{{ price(p.odds) }}</strong>
+              <div><b>{{ p.prediction }}</b><span>{{ p.tipsterId?.name || 'BraTipsters tipster' }}</span></div><strong>{{ price(p.odds) }}</strong>
             </RouterLink>
-            <div v-if="!predictions.length" class="empty compact">No published BraTips prediction for this fixture.</div>
+            <div v-if="!predictions.length" class="empty compact">No published BraTipsters prediction for this fixture.</div>
           </div>
 
           <div class="mc-panel">

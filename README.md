@@ -1,6 +1,6 @@
-# BraTips Public / User Interface
+# BraTipsters Public / User Interface
 
-Public-facing Vue 3 + Vite application for BraTips.
+Public-facing Vue 3 + Vite application for BraTipsters.
 
 ## Includes
 - Public browsing without authentication
@@ -12,7 +12,7 @@ Public-facing Vue 3 + Vite application for BraTips.
 - Public prediction track record
 - Authenticated My Picks tracker with stake and potential return
 - Authenticated tipster dashboard and prediction submission
-- Uses the same BraTips logo as the admin app
+- Uses the same BraTipsters logo as the admin app
 
 ## Run
 1. Copy `.env.example` to `.env` and set `VITE_API_URL`.
@@ -22,7 +22,7 @@ Public-facing Vue 3 + Vite application for BraTips.
 
 The My Picks feature records a user's selections and stake for tracking; it does not process deposits, withdrawals, bookmaker execution, or real-money settlement.
 
-## BraTips public platform
+## BraTipsters public platform
 
 The public app includes the football home feed, matches, live scores, Match Centre, odds movement, Dropping Odds, Bet of the Day, prediction history, tipsters and Stripe membership entry points.
 

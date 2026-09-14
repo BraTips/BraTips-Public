@@ -2,11 +2,11 @@
   <div class="auth-page">
     <section class="auth-showcase auth-showcase-register">
       <div class="auth-showcase-inner">
-        <RouterLink to="/" class="auth-brand"><img src="/logo-auth.svg" alt="BraTips" /></RouterLink>
+        <RouterLink to="/" class="auth-brand"><img src="/logo-auth.svg" alt="BraTipsters" /></RouterLink>
         <div class="auth-showcase-copy">
           <span class="auth-kicker">YOUR FOOTBALL DASHBOARD</span>
           <h1>Follow smarter.<br /><span>Play informed.</span></h1>
-          <p>Create one BraTips account to follow tipsters, save your favourite picks and keep your football activity in one place.</p>
+          <p>Create one BraTipsters account to follow tipsters, save your favourite picks and keep your football activity in one place.</p>
         </div>
         <div class="auth-feature-list">
           <div><i>01</i><span><b>Discover tipsters</b> Compare records before you follow.</span></div>
@@ -18,10 +18,10 @@
 
     <section class="auth-panel">
       <div class="auth-form-shell auth-register-shell">
-        <div class="auth-mobile-brand"><img src="/logo-light.svg" alt="BraTips" /></div>
+        <div class="auth-mobile-brand"><img src="/logo-light.svg" alt="BraTipsters" /></div>
         <div class="auth-heading">
           <span class="auth-section-label">CREATE ACCOUNT</span>
-          <h2>Join BraTips</h2>
+          <h2>Join BraTipsters</h2>
           <p>It only takes a minute to create your football profile.</p>
         </div>
 
@@ -43,9 +43,9 @@
         </form>
 
         <div class="auth-divider"><span>ALREADY A MEMBER?</span></div>
-        <RouterLink to="/login" class="auth-secondary">Log in to BraTips <b>→</b></RouterLink>
+        <RouterLink to="/login" class="auth-secondary">Log in to BraTipsters <b>→</b></RouterLink>
         <div class="auth-tipster-cta"><span>Want to publish your own picks?</span><RouterLink to="/tipster-signup">Become a tipster</RouterLink></div>
-        <p class="auth-footnote">By creating an account, you agree to use BraTips responsibly and for informational purposes.</p>
+        <p class="auth-footnote">By creating an account, you agree to use BraTipsters responsibly and for informational purposes.</p>
       </div>
     </section>
   </div>

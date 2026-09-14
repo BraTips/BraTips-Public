@@ -10,7 +10,38 @@ async function fetchWithTimeout(url:string, options:RequestInit={}, timeoutMs=15
   finally{window.clearTimeout(timer);}
 }
 
-async function request(path:string, options:RequestInit={}){
+type CacheEntry={expiresAt:number,data:any};
+const cachePrefix='bratips_public_cache_v2:';
+const memoryCache=new Map<string,CacheEntry>();
+function cacheTtl(path:string){
+  if(path.includes('/matches/live')) return 0;
+  if(path.includes('/dropping-odds')) return 0;
+  if(path.includes('/matches/today')) return 30_000;
+  if(path.includes('/matches/')) return 60_000;
+  if(path.includes('/prediction-history')) return 5*60_000;
+  return 2*60_000;
+}
+function cacheAllowed(path:string){
+  if(accessToken && (path.startsWith('/auth/') || path.startsWith('/me/'))) return false;
+  if(path.includes('/admin/')) return false;
+  return true;
+}
+function readCache(path:string){
+  const now=Date.now(); const hit=memoryCache.get(path); if(hit && hit.expiresAt>now) return hit.data;
+  try{const raw=sessionStorage.getItem(cachePrefix+path); if(raw){const parsed=JSON.parse(raw) as CacheEntry; if(parsed.expiresAt>now){memoryCache.set(path,parsed);return parsed.data;} sessionStorage.removeItem(cachePrefix+path);}}catch{}
+  return null;
+}
+function writeCache(path:string,data:any,ttl:number){
+  if(!ttl || !cacheAllowed(path)) return;
+  const entry={expiresAt:Date.now()+ttl,data}; memoryCache.set(path,entry);
+  try{sessionStorage.setItem(cachePrefix+path,JSON.stringify(entry));}catch{}
+}
+export function clearPublicCache(){memoryCache.clear();try{for(let i=sessionStorage.length-1;i>=0;i--){const k=sessionStorage.key(i);if(k?.startsWith(cachePrefix))sessionStorage.removeItem(k)}}catch{} }
+
+async function request(path:string, options:RequestInit={}, cache=true){
+  const isGet=!options.method || options.method.toUpperCase()==='GET';
+  const ttl=cache && isGet && cacheAllowed(path) ? cacheTtl(path) : 0;
+  if(ttl){const cached=readCache(path);if(cached!==null)return cached;}
   const headers=new Headers(options.headers);
   headers.set('Content-Type','application/json');
   if(accessToken)headers.set('Authorization',`Bearer ${accessToken}`);
@@ -18,21 +49,17 @@ async function request(path:string, options:RequestInit={}){
   try{
     r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
   }catch(e:any){
-    throw new Error(e?.name==='AbortError'?'The server took too long to respond. Please try again.':'Unable to reach the BraTips server.');
+    throw new Error(e?.name==='AbortError'?'The server took too long to respond. Please try again.':'Unable to reach the BraTipsters server.');
   }
   if(r.status===401&&path!='/auth/refresh'){
     try{
       const rr=await fetchWithTimeout(`${API}/auth/refresh`,{method:'POST',credentials:'include'});
-      if(rr.ok){
-        const d=await rr.json();
-        setToken(d.accessToken);
-        headers.set('Authorization',`Bearer ${d.accessToken}`);
-        r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
-      }
+      if(rr.ok){const d=await rr.json();setToken(d.accessToken);headers.set('Authorization',`Bearer ${d.accessToken}`);r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});}
     }catch{}
   }
   const d=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(d.message||'Request failed');
+  if(ttl)writeCache(path,d,ttl);
   return d;
 }
-export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>request(p,{method:'POST',body:JSON.stringify(b)}),patch:(p:string,b:any)=>request(p,{method:'PATCH',body:JSON.stringify(b)}),delete:(p:string)=>request(p,{method:'DELETE'})};
+export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'POST',body:JSON.stringify(b)},false)},patch:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'PATCH',body:JSON.stringify(b)},false)},delete:(p:string)=>{clearPublicCache();return request(p,{method:'DELETE'},false)}};

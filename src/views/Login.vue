@@ -2,7 +2,7 @@
   <div class="auth-page">
     <section class="auth-showcase">
       <div class="auth-showcase-inner">
-        <RouterLink to="/" class="auth-brand"><img src="/logo-auth.svg" alt="BraTips" /></RouterLink>
+        <RouterLink to="/" class="auth-brand"><img src="/logo-auth.svg" alt="BraTipsters" /></RouterLink>
         <div class="auth-showcase-copy">
           <span class="auth-kicker">FOOTBALL INTELLIGENCE</span>
           <h1>Know the pick.<br /><span>Track the form.</span></h1>
@@ -19,11 +19,11 @@
 
     <section class="auth-panel">
       <div class="auth-form-shell">
-        <div class="auth-mobile-brand"><img src="/logo-light.svg" alt="BraTips" /></div>
+        <div class="auth-mobile-brand"><img src="/logo-light.svg" alt="BraTipsters" /></div>
         <div class="auth-heading">
           <span class="auth-section-label">MEMBER ACCESS</span>
           <h2>Welcome back</h2>
-          <p>Sign in to continue to your BraTips dashboard.</p>
+          <p>Sign in to continue to your BraTipsters dashboard.</p>
         </div>
 
         <form class="auth-form" @submit.prevent="submit">
@@ -36,13 +36,13 @@
             <div class="auth-label-row"><label for="login-password">Password</label><span class="auth-hint">8+ characters</span></div>
             <div class="auth-input-wrap"><span>●</span><input id="login-password" v-model="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /></div>
           </div>
-          <button class="auth-submit" type="submit" :disabled="busy"><span>{{ busy ? 'Signing in…' : 'Log in to BraTips' }}</span><b>→</b></button>
+          <button class="auth-submit" type="submit" :disabled="busy"><span>{{ busy ? 'Signing in…' : 'Log in to BraTipsters' }}</span><b>→</b></button>
         </form>
 
         <div class="auth-divider"><span>NEW TO BRATIPS?</span></div>
         <RouterLink to="/signup" class="auth-secondary">Create your account <b>→</b></RouterLink>
         <div class="auth-tipster-cta"><span>Already have a strategy to share?</span><RouterLink to="/tipster-signup">Become a tipster</RouterLink></div>
-        <p class="auth-footnote">By continuing, you agree to use BraTips responsibly and for informational purposes.</p>
+        <p class="auth-footnote">By continuing, you agree to use BraTipsters responsibly and for informational purposes.</p>
       </div>
     </section>
   </div>

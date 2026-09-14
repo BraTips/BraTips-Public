@@ -3,12 +3,12 @@
     <section class="tipster-apply-hero">
       <div class="wrap tipster-apply-hero-grid">
         <div>
-          <RouterLink to="/" class="tipster-auth-brand"><img src="/logo-auth.svg" alt="BraTips" /></RouterLink>
+          <RouterLink to="/" class="tipster-auth-brand"><img src="/logo-auth.svg" alt="BraTipsters" /></RouterLink>
           <span class="auth-kicker">BRATIPS CREATOR PROGRAM</span>
           <h1>Turn your football knowledge into a <span>track record.</span></h1>
-          <p>Apply to become a BraTips tipster, publish your predictions and build a profile that followers can judge on performance.</p>
+          <p>Apply to become a BraTipsters tipster, publish your predictions and build a profile that followers can judge on performance.</p>
         </div>
-        <div class="tipster-hero-status"><span class="auth-live-dot"></span><b>APPLICATIONS OPEN</b><small>Reviewed by the BraTips team</small></div>
+        <div class="tipster-hero-status"><span class="auth-live-dot"></span><b>APPLICATIONS OPEN</b><small>Reviewed by the BraTipsters team</small></div>
       </div>
     </section>
 

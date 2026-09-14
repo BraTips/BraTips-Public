@@ -1,6 +1,6 @@
 <template>
   <div class="history-page page-animate"><div class="wrap">
-    <section class="history-title"><span class="eyebrow">BraTips football intelligence</span><h1>Tip History</h1><p>Review settled football tips, compare outcomes and inspect the record behind every selection.</p></section>
+    <section class="history-title"><span class="eyebrow">BraTipsters football intelligence</span><h1>Tip History</h1><p>Review settled football tips, compare outcomes and inspect the record behind every selection.</p></section>
 
     <section class="history-filter-card">
       <div class="history-filter-grid">
