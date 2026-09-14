@@ -1,4 +1,5 @@
-const API=import.meta.env.VITE_API_URL||'http://localhost:4000/api/v1';
+const API=(import.meta.env.VITE_API_URL||'http://localhost:4000/api/v1').replace(/\/$/,'');
+let refreshPromise:Promise<string|null>|null=null;
 let accessToken=localStorage.getItem('bratips_access')||'';
 export function setToken(t:string){accessToken=t;if(t)localStorage.setItem('bratips_access',t);else localStorage.removeItem('bratips_access')}
 export function getToken(){return accessToken}
@@ -53,8 +54,26 @@ async function request(path:string, options:RequestInit={}, cache=true){
   }
   if(r.status===401&&path!='/auth/refresh'){
     try{
-      const rr=await fetchWithTimeout(`${API}/auth/refresh`,{method:'POST',credentials:'include'});
-      if(rr.ok){const d=await rr.json();setToken(d.accessToken);headers.set('Authorization',`Bearer ${d.accessToken}`);r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});}
+      if(!refreshPromise){
+        refreshPromise=(async()=>{
+          try{
+            const rr=await fetchWithTimeout(`${API}/auth/refresh`,{method:'POST',credentials:'include'});
+            if(!rr.ok)return null;
+            const d=await rr.json();
+            if(!d?.accessToken)return null;
+            setToken(d.accessToken);
+            return d.accessToken as string;
+          }catch{return null}
+          finally{refreshPromise=null;}
+        })();
+      }
+      const freshToken=await refreshPromise;
+      if(freshToken){
+        headers.set('Authorization',`Bearer ${freshToken}`);
+        r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
+      } else {
+        setToken('');
+      }
     }catch{}
   }
   const d=await r.json().catch(()=>({}));
