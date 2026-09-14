@@ -21,3 +21,9 @@ Public-facing Vue 3 + Vite application for BraTips.
 4. Build with `npm run build`.
 
 The My Picks feature records a user's selections and stake for tracking; it does not process deposits, withdrawals, bookmaker execution, or real-money settlement.
+
+## BraTips public platform
+
+The public app includes the football home feed, matches, live scores, Match Centre, odds movement, Dropping Odds, Bet of the Day, prediction history, tipsters and Stripe membership entry points.
+
+The favicon is served from `/favicon.svg`.

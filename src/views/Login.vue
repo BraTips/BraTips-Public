@@ -1,2 +1,76 @@
-<template><div class="form-page"><div class="form-wrap"><form class="form-card" @submit.prevent="submit"><img src="/logo.svg" style="width:155px;margin-bottom:24px"/><h1>Welcome back</h1><p class="muted">Log in to play tipster picks and manage your account.</p><div v-if="error" class="error">{{error}}</div><div class="field"><label>Email</label><input v-model="email" type="email" required/></div><div class="field"><label>Password</label><input v-model="password" type="password" required/></div><button class="btn" :disabled="busy">{{busy?'Signing in…':'Log in'}}</button><div class="switch">New here? <RouterLink to="/signup" style="color:var(--pink);font-weight:700">Create an account</RouterLink> · <RouterLink to="/tipster-signup" style="color:var(--pink);font-weight:700">Become a tipster</RouterLink></div></form></div></div></template>
-<script setup lang="ts">import {ref} from 'vue';import {RouterLink,useRoute,useRouter} from 'vue-router';import {useAuth} from '../stores/auth';const auth=useAuth(),route=useRoute(),router=useRouter();const email=ref(''),password=ref(''),error=ref(''),busy=ref(false);async function submit(){busy.value=true;error.value='';try{await auth.login(email.value,password.value);router.push(String(route.query.redirect||'/dashboard'))}catch(e:any){error.value=e.message}finally{busy.value=false}}</script>
+<template>
+  <div class="auth-page">
+    <section class="auth-showcase">
+      <div class="auth-showcase-inner">
+        <RouterLink to="/" class="auth-brand"><img src="/logo-auth.svg" alt="BraTips" /></RouterLink>
+        <div class="auth-showcase-copy">
+          <span class="auth-kicker">FOOTBALL INTELLIGENCE</span>
+          <h1>Know the pick.<br /><span>Track the form.</span></h1>
+          <p>Follow trusted tipsters, compare real performance and stay close to the football action that matters.</p>
+        </div>
+        <div class="auth-signal-grid">
+          <div><strong>24/7</strong><span>Football coverage</span></div>
+          <div><strong>LIVE</strong><span>Match intelligence</span></div>
+          <div><strong>PRO</strong><span>Tipster insights</span></div>
+        </div>
+        <div class="auth-ticker"><span class="auth-live-dot"></span><b>BRATIPS SIGNAL</b><span>Track picks. Follow results. Stay informed.</span></div>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-form-shell">
+        <div class="auth-mobile-brand"><img src="/logo-light.svg" alt="BraTips" /></div>
+        <div class="auth-heading">
+          <span class="auth-section-label">MEMBER ACCESS</span>
+          <h2>Welcome back</h2>
+          <p>Sign in to continue to your BraTips dashboard.</p>
+        </div>
+
+        <form class="auth-form" @submit.prevent="submit">
+          <div v-if="error" class="auth-alert error">{{ error }}</div>
+          <div class="auth-field">
+            <label for="login-email">Email address</label>
+            <div class="auth-input-wrap"><span>✉</span><input id="login-email" v-model="email" type="email" autocomplete="email" placeholder="you@example.com" required /></div>
+          </div>
+          <div class="auth-field">
+            <div class="auth-label-row"><label for="login-password">Password</label><span class="auth-hint">8+ characters</span></div>
+            <div class="auth-input-wrap"><span>●</span><input id="login-password" v-model="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /></div>
+          </div>
+          <button class="auth-submit" type="submit" :disabled="busy"><span>{{ busy ? 'Signing in…' : 'Log in to BraTips' }}</span><b>→</b></button>
+        </form>
+
+        <div class="auth-divider"><span>NEW TO BRATIPS?</span></div>
+        <RouterLink to="/signup" class="auth-secondary">Create your account <b>→</b></RouterLink>
+        <div class="auth-tipster-cta"><span>Already have a strategy to share?</span><RouterLink to="/tipster-signup">Become a tipster</RouterLink></div>
+        <p class="auth-footnote">By continuing, you agree to use BraTips responsibly and for informational purposes.</p>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useAuth } from '../stores/auth'
+
+const auth = useAuth()
+const route = useRoute()
+const router = useRouter()
+const email = ref('')
+const password = ref('')
+const error = ref('')
+const busy = ref(false)
+
+async function submit() {
+  busy.value = true
+  error.value = ''
+  try {
+    await auth.login(email.value, password.value)
+    router.push(String(route.query.redirect || '/dashboard'))
+  } catch (e: any) {
+    error.value = e?.message || 'Unable to sign in. Please check your details.'
+  } finally {
+    busy.value = false
+  }
+}
+</script>

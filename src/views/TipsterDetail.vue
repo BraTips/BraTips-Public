@@ -1,2 +1,59 @@
-<template><div class="wrap"><div v-if="profile"><div class="page-head"><div class="profile-hero"><div class="profile-big">{{profile.username?.[0]?.toUpperCase()}}</div><div><h1 style="margin:0">@{{profile.username}}</h1><p class="muted">{{profile.bio}}</p><button class="ghost" @click="toggleFollow">{{following?'Following ✓':'Follow tipster'}}</button></div></div><div class="kpis"><div class="stat"><span class="muted small">Tips</span><b>{{profile.totalTips}}</b></div><div class="stat"><span class="muted small">Wins</span><b>{{profile.wins}}</b></div><div class="stat"><span class="muted small">Win rate</span><b>{{rate}}%</b></div><div class="stat"><span class="muted small">Best streak</span><b>{{profile.longestStreak||0}}</b></div></div></div><h2>Published picks</h2><div class="grid2"><PickCard v-for="p in picks" :key="p._id" :pick="p" @play="play"/></div><div v-if="!picks.length" class="empty">No published picks yet.</div></div><div v-else class="empty">Loading tipster…</div></div></template>
-<script setup lang="ts">import {computed,onMounted,ref} from 'vue';import {useRoute,useRouter} from 'vue-router';import {api} from '../services/api';import {useAuth} from '../stores/auth';import PickCard from '../components/PickCard.vue';const route=useRoute(),router=useRouter(),auth=useAuth(),profile=ref<any>(null),picks=ref<any[]>([]),following=ref(false);const rate=computed(()=>profile.value?.totalTips?Math.round(profile.value.wins/profile.value.totalTips*1000)/10:0);function play(){router.push('/login')} async function loadFollow(){if(!auth.isLoggedIn)return;try{const d=await api.get('/me/follows');following.value=(d.data||[]).some((x:any)=>String(x.tipsterId?._id||x.tipsterId)===String(profile.value?.userId))}catch{}} async function toggleFollow(){if(!auth.isLoggedIn){router.push({path:'/login',query:{redirect:route.fullPath}});return}try{if(following.value){await api.delete(`/me/follows/${profile.value.userId}`);following.value=false}else{await api.post(`/me/follows/${profile.value.userId}`,{});following.value=true}}catch(e:any){alert(e.message)}}onMounted(async()=>{try{const d=await api.get(`/tipsters/${route.params.username}`);profile.value=d.data.profile;picks.value=d.data.predictions;await loadFollow()}catch{}})</script>
+<template>
+  <div class="pro-page page-animate">
+    <div class="wrap">
+      <div v-if="loading" class="pro-panel pro-loading"><div class="loading-avatar"></div><div><span></span><span></span><span></span></div></div>
+      <div v-else-if="error" class="pro-panel error">{{ error }} <RouterLink class="btn" to="/tipsters">Back to tipsters</RouterLink></div>
+      <template v-else-if="profile">
+        <div class="pro-profile-hero">
+          <div class="pro-profile-main">
+            <div class="profile-big">{{ profile.username?.[0]?.toUpperCase() }}</div>
+            <div><span class="eyebrow">Verified performance profile</span><h1>@{{ profile.username }}</h1><p>{{ profile.bio || 'Football analysis and transparent prediction history.' }}</p><div class="profile-actions"><button class="btn" @click="toggleFollow">{{ following ? 'Following ✓' : 'Follow tipster' }}</button><RouterLink class="ghost" to="/history">Public history</RouterLink></div></div>
+          </div>
+          <div class="profile-record"><span>Current streak</span><b>{{ profile.currentStreak || 0 }}</b><small>Best {{ profile.longestStreak || 0 }}</small></div>
+        </div>
+
+        <div class="pro-stat-strip profile-stats">
+          <div><span>Total tips</span><b>{{ profile.totalTips || 0 }}</b></div>
+          <div><span>Wins</span><b>{{ profile.wins || 0 }}</b></div>
+          <div><span>Win rate</span><b>{{ rate }}%</b></div>
+          <div><span>ROI</span><b :class="Number(profile.roi || 0) >= 0 ? 'positive' : 'negative'">{{ Number(profile.roi || 0).toFixed(1) }}%</b></div>
+        </div>
+
+        <div class="pro-section-head"><div><span class="eyebrow">Prediction feed</span><h2>Published picks</h2></div><span>{{ picks.length }} tracked picks</span></div>
+        <div class="grid2">
+          <PickCard v-for="p in picks" :key="p._id" :pick="p" @play="play" />
+        </div>
+        <div v-if="!picks.length" class="pro-panel empty">No published picks yet.</div>
+      </template>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { api } from '../services/api';
+import { useAuth } from '../stores/auth';
+import PickCard from '../components/PickCard.vue';
+
+const route=useRoute(), router=useRouter(), auth=useAuth();
+const profile=ref<any>(null), picks=ref<any[]>([]), following=ref(false), loading=ref(true), error=ref('');
+const rate=computed(()=>profile.value?.totalTips ? Math.round(profile.value.wins/profile.value.totalTips*1000)/10 : 0);
+function play(){ if(auth.isLoggedIn) router.push('/dashboard'); else router.push({path:'/login',query:{redirect:route.fullPath}}); }
+async function loadFollow(){
+  following.value=false;
+  if(!auth.isLoggedIn || !profile.value?.userId) return;
+  try { const d=await api.get('/me/follows'); following.value=(d.data||[]).some((x:any)=>String(x.tipsterId?._id||x.tipsterId)===String(profile.value.userId)); } catch {}
+}
+async function load(){
+  loading.value=true; error.value=''; profile.value=null; picks.value=[];
+  try { const d=await api.get(`/tipsters/${encodeURIComponent(String(route.params.username))}`); profile.value=d.data.profile; picks.value=d.data.predictions || []; await loadFollow(); }
+  catch(e:any){ error.value=e?.message || 'Unable to load this tipster.'; }
+  finally { loading.value=false; }
+}
+async function toggleFollow(){
+  if(!auth.isLoggedIn){ router.push({path:'/login',query:{redirect:route.fullPath}}); return; }
+  try { if(following.value){ await api.delete(`/me/follows/${profile.value.userId}`); following.value=false; } else { await api.post(`/me/follows/${profile.value.userId}`,{}); following.value=true; } }
+  catch(e:any){ alert(e.message); }
+}
+watch(()=>route.params.username, load, { immediate:true });
+</script>
