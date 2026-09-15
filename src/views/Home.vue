@@ -35,6 +35,36 @@
           <span class="signal-live"><i></i> Updated live</span>
         </div>
 
+        <section class="home-panel tipster-predictions-panel">
+          <div class="panel-head">
+            <div><span class="eyebrow">From our tipsters</span><h2>Tipster Predictions</h2><p class="panel-subcopy">Selections published by approved tipsters. Premium picks are clearly marked and locked for non-subscribers.</p></div>
+            <RouterLink to="/tipsters" class="text-link">Explore tipsters →</RouterLink>
+          </div>
+          <div v-if="loading.tipstersPredictions" class="weekly-prediction-list">
+            <div class="weekly-prediction-row skeleton-row" v-for="i in 4" :key="'sktp-'+i"><div class="skel skel-time"></div><div class="skel skel-teams"></div><div class="skel skel-pick"></div></div>
+          </div>
+          <div v-else-if="tipsterPredictions.length" class="weekly-prediction-list">
+            <RouterLink v-for="p in tipsterPredictions" :key="p._id" :to="p.matchId?`/matches/${p.matchId._id||p.matchId}`:`/predictions/${p._id}`" class="weekly-prediction-row">
+              <div class="weekly-date"><b>{{ predictionDate(p) }}</b><small>{{ predictionTime(p) }}</small></div>
+              <div class="weekly-fixture">
+                <div><TeamLogo :src="predictionHomeLogo(p)" :name="predictionHomeName(p)" size="sm"/><b>{{ predictionHomeName(p) }}</b></div>
+                <span>vs</span>
+                <div><b>{{ predictionAwayName(p) }}</b><TeamLogo :src="predictionAwayLogo(p)" :name="predictionAwayName(p)" size="sm"/></div>
+                <small>{{ p.tipsterId?.name || 'Tipster' }} · {{ p.league || p.matchId?.leagueId?.name || 'Football' }}</small>
+              </div>
+              <div class="weekly-pick" :class="{locked:p.locked}">
+                <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? '♛ PREMIUM' : 'TIPSTER PICK' }}</span>
+                <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
+                <strong v-if="!p.locked && p.odds">{{ Number(p.odds).toFixed(2) }}</strong>
+                <strong v-else>🔒</strong>
+              </div>
+              <div class="weekly-arrow">›</div>
+            </RouterLink>
+            <div class="weekly-more"><RouterLink to="/predictions">View all published predictions →</RouterLink></div>
+          </div>
+          <div v-else class="empty-state">No upcoming tipster predictions have been published yet.</div>
+        </section>
+
         <section class="feature-feed">
           <template v-if="loading.bot">
             <div class="feature-row skeleton-row" v-for="i in 3" :key="'sk-'+i">
@@ -173,12 +203,12 @@ import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import TeamLogo from '../components/TeamLogo.vue'
 
-const matches=ref<any[]>([]), liveMatches=ref<any[]>([]), bot=ref<any[]>([]), weeklyPredictions=ref<any[]>([]), topTipsters=ref<any[]>([]), dropCount=ref(0), settledWinRate=ref(0)
+const matches=ref<any[]>([]), liveMatches=ref<any[]>([]), bot=ref<any[]>([]), tipsterPredictions=ref<any[]>([]), weeklyPredictions=ref<any[]>([]), topTipsters=ref<any[]>([]), dropCount=ref(0), settledWinRate=ref(0)
 const displayMatches=computed(()=>[...liveMatches.value,...matches.value.filter(x=>x.status!=='live')].slice(0,8))
 // Per-section loading flags: only true until that section has SOME data (cached or
 // fresh) to show, so a repeat visit renders instantly from cache with no skeleton flash,
 // while a first-ever visit still gets a skeleton instead of an empty page.
-const loading=ref({bot:true, matches:true, weekly:true, tipsters:true})
+const loading=ref({bot:true, matches:true, weekly:true, tipsters:true, tipstersPredictions:true})
 function teamName(t:any){return t?.name||'Team'}
 function teamLogo(t:any){return t?.logo||''}
 function homeTeam(p:any){return p?.matchId?.homeTeamId||{}}
@@ -217,6 +247,11 @@ onMounted(async()=>{
 
   api.getSWR('/matches/today', (fresh:any)=>{matches.value=fresh.data||[]})
     .then((r:any)=>{matches.value=r.data||[]}).catch(()=>{}).finally(()=>{loading.value.matches=false})
+
+  api.get('/predictions?limit=50&tipster=true&upcoming=true&refresh=1')
+    .then((r:any)=>{tipsterPredictions.value=(r.data||[]).slice(0,8)})
+    .catch(()=>{})
+    .finally(()=>{loading.value.tipstersPredictions=false})
 
   api.get('/predictions?limit=50&horizon=weekly&refresh=1')
     .then(async(r:any)=>{
