@@ -103,12 +103,12 @@
 </template>
 
 <script setup lang="ts">
-import {computed,onMounted,onUnmounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';
+import {computed,onMounted,onUnmounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';import {formatTime,formatDate,formatOdds} from '../utils/formatters';
 const tabs=[{v:'today',l:'Today',icon:'●'},{v:'live',l:'Live',icon:'◉'},{v:'scheduled',l:'Upcoming',icon:'→'},{v:'finished',l:'Results',icon:'✓'}];
 const tab=ref('today'),matches=ref<any[]>([]),predictions=ref<any[]>([]),loading=ref(true),error=ref(''),leagueFilter=ref('all'),marketFilter=ref('all');let refreshTimer:number|undefined;
-const time=(v:string)=>v?new Date(v).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';
-const dateLabel=(v:string)=>v?new Date(v).toLocaleDateString([],{weekday:'short',day:'2-digit',month:'short'}):'';
-const price=(v:any)=>Number(v)>0?Number(v).toFixed(2):'—';
+const time=(v:string)=>formatTime(v);
+const dateLabel=(v:string)=>formatDate(v);
+const price=(v:any)=>formatOdds(v);
 const predictionFor=(id:any)=>predictions.value.find((p:any)=>String(p.matchId?._id||p.matchId)===String(id));
 const oddsCount=(id:any)=>{const m=matches.value.find(x=>String(x._id)===String(id));return m?.odds?.length||0};
 const leagues=computed(()=>Array.from(new Set(matches.value.map(m=>m.leagueId?.name).filter(Boolean))).sort() as string[]);

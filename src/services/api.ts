@@ -1,7 +1,4 @@
-import {useGlobalLoader} from '../composables/feedback';
-
 const API=(import.meta.env.VITE_API_URL||'http://localhost:4000/api/v1').replace(/\/$/,'');
-const globalLoader=useGlobalLoader();
 let refreshPromise:Promise<string|null>|null=null;
 let accessToken=localStorage.getItem('bratips_access')||'';
 export function setToken(t:string){accessToken=t;if(t)localStorage.setItem('bratips_access',t);else localStorage.removeItem('bratips_access')}
@@ -56,7 +53,6 @@ async function request(path:string, options:RequestInit={}, cache=true){
   if(ttl){const cached=readCache(path);if(cached!==null)return cached;}
   const headers=new Headers(options.headers);headers.set('Content-Type','application/json');
   if(accessToken)headers.set('Authorization',`Bearer ${accessToken}`);
-  globalLoader.start();
   try{
     let r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
     if(r.status===401&&path!='/auth/refresh'){
@@ -73,7 +69,7 @@ async function request(path:string, options:RequestInit={}, cache=true){
   }catch(e:any){
     if(e instanceof Error && e.message && !/Failed to fetch|NetworkError/i.test(e.message))throw e;
     throw new Error(e?.name==='AbortError'?'The server took too long to respond. Please try again.':'Unable to reach the BraTipsters server.');
-  }finally{globalLoader.stop();}
+  }
 }
 
 export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'POST',body:JSON.stringify(b)},false)},patch:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'PATCH',body:JSON.stringify(b)},false)},delete:(p:string)=>{clearPublicCache();return request(p,{method:'DELETE'},false)},

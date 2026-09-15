@@ -83,8 +83,8 @@
     </header>
 
     <main><RouterView/></main>
-    <BrandedLoader :visible="loadingVisible"/>
     <BrandedConfirmModal/>
+    <BrandedToast/>
 
     <footer v-if="!minimalChrome">
       <div class="wrap foot">
@@ -103,11 +103,9 @@ import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import {RouterLink,RouterView,useRoute} from 'vue-router';
 import {useAuth} from './stores/auth';
 import NotificationBell from './components/NotificationBell.vue';
-import BrandedLoader from './components/BrandedLoader.vue';
 import BrandedConfirmModal from './components/BrandedConfirmModal.vue';
-import {useGlobalLoader} from './composables/feedback';
+import BrandedToast from './components/BrandedToast.vue';
 const auth=useAuth();
-const {loadingVisible}=useGlobalLoader();
 const route=useRoute();
 const mobileOpen=ref(false);
 const closeMobile=()=>{mobileOpen.value=false};

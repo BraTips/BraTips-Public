@@ -55,7 +55,7 @@
               <div class="weekly-pick" :class="{locked:p.locked}">
                 <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? '♛ PREMIUM' : 'TIPSTER PICK' }}</span>
                 <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
-                <strong v-if="!p.locked && p.odds">{{ Number(p.odds).toFixed(2) }}</strong>
+                <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
                 <strong v-else>🔒</strong>
               </div>
               <div class="weekly-arrow">›</div>
@@ -85,7 +85,7 @@
               <div class="feature-pick">
                 <small>Bet of the Day</small>
                 <b>{{ p.prediction }}</b>
-                <span v-if="p.odds">{{ Number(p.odds).toFixed(2) }}</span>
+                <span v-if="p.odds">{{ formatOdds(p.odds) }}</span>
               </div>
               <div class="row-arrow">›</div>
             </RouterLink>
@@ -113,7 +113,7 @@
               <div class="weekly-pick" :class="{locked:p.locked}">
                 <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? '♛ PREMIUM' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
                 <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
-                <strong v-if="!p.locked && p.odds">{{ Number(p.odds).toFixed(2) }}</strong>
+                <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
                 <strong v-else>🔒</strong>
               </div>
               <div class="weekly-arrow">›</div>
@@ -135,7 +135,7 @@
               <RouterLink v-for="m in displayMatches" :key="m._id" :to="'/matches/' + m._id" class="compact-match">
                 <div class="compact-time" :class="{ live: m.status === 'live' }"><b>{{ m.status === 'live' ? 'LIVE' : kickoff(m.kickoff) }}</b><small v-if="m.status === 'live'">{{ m.homeScore }}:{{ m.awayScore }}</small></div>
                 <div class="compact-teams"><span><TeamLogo :src="teamLogo(m.homeTeamId)" :name="teamName(m.homeTeamId)" size="sm"/>{{ teamName(m.homeTeamId) }}</span><span><TeamLogo :src="teamLogo(m.awayTeamId)" :name="teamName(m.awayTeamId)" size="sm"/>{{ teamName(m.awayTeamId) }}</span></div>
-                <div class="compact-tip" v-if="firstOdd(m)"><small>{{ m.status === 'live' ? 'BraTipsters Odds' : (firstOdd(m).marketName || 'Market') }}</small><b>{{ firstOdd(m).label }}</b><strong>{{ Number(firstOdd(m).value).toFixed(2) }}</strong></div>
+                <div class="compact-tip" v-if="firstOdd(m)"><small>{{ m.status === 'live' ? 'BraTipsters Odds' : (firstOdd(m).marketName || 'Market') }}</small><b>{{ firstOdd(m).label }}</b><strong>{{ formatOdds(firstOdd(m).value) }}</strong></div>
                 <div class="compact-icons"><span v-if="m.odds && m.odds.length">ODDS</span><span v-if="m.status === 'live'" class="live-dot">●</span><b>›</b></div>
               </RouterLink>
               <div v-if="!displayMatches.length" class="empty-state">No matches available right now.</div>
@@ -202,6 +202,7 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import TeamLogo from '../components/TeamLogo.vue'
+import { formatDate, formatOdds, formatTime } from '../utils/formatters'
 
 const matches=ref<any[]>([]), liveMatches=ref<any[]>([]), bot=ref<any[]>([]), tipsterPredictions=ref<any[]>([]), weeklyPredictions=ref<any[]>([]), topTipsters=ref<any[]>([]), dropCount=ref(0), settledWinRate=ref(0)
 const displayMatches=computed(()=>[...liveMatches.value,...matches.value.filter(x=>x.status!=='live')].slice(0,8))
@@ -219,7 +220,7 @@ function homeLogo(p:any){return teamLogo(homeTeam(p))}
 function awayLogo(p:any){return teamLogo(awayTeam(p))}
 function matchId(p:any){return p?.matchId?._id||''}
 function leagueName(p:any){return p?.matchId?.leagueId?.name||p?.league||'Football'}
-function kickoff(v:any){return v?new Date(v).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'—'}
+function kickoff(v:any){return formatTime(v)}
 function kickoffTime(p:any){return kickoff(p?.matchId?.kickoff)}
 function firstOdd(m:any){return Array.isArray(m?.odds)&&m.odds.length?m.odds[0]:null}
 function initials(v:string){return (v||'BT').slice(0,2).toUpperCase()}
@@ -230,8 +231,8 @@ function predictionHomeName(p:any){return predictionMatch(p)?.homeTeamId?.shortN
 function predictionAwayName(p:any){return predictionMatch(p)?.awayTeamId?.shortName||predictionMatch(p)?.awayTeamId?.name||'Away'}
 function predictionHomeLogo(p:any){return predictionMatch(p)?.homeTeamId?.logo||''}
 function predictionAwayLogo(p:any){return predictionMatch(p)?.awayTeamId?.logo||''}
-function predictionDate(p:any){const d=predictionMatch(p)?.kickoff||p?.kickoff||p?.publishedAt;return d?new Date(d).toLocaleDateString(undefined,{weekday:'short',day:'2-digit',month:'short'}):'—'}
-function predictionTime(p:any){const d=predictionMatch(p)?.kickoff||p?.kickoff;return d?new Date(d).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}):'TBC'}
+function predictionDate(p:any){const d=predictionMatch(p)?.kickoff||p?.kickoff||p?.publishedAt;return formatDate(d)}
+function predictionTime(p:any){const d=predictionMatch(p)?.kickoff||p?.kickoff;return d?formatTime(d):'TBC'}
 function winLossDots(t:any){
   const total=10
   const wins=Number(t.wins||0), losses=Number(t.losses||0), played=wins+losses
