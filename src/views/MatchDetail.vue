@@ -35,7 +35,11 @@
       <div class="mc-skeleton hero"></div><div class="mc-skeleton"></div><div class="mc-skeleton"></div>
     </div>
 
-    <main v-else-if="match" class="wrap mc-layout">
+    <div v-else-if="!match" class="wrap mc-not-found">
+      <div class="mc-panel empty"><h2>Match not found</h2><p>This fixture may no longer be available or the link is invalid.</p><RouterLink to="/matches" class="btn">Back to matches</RouterLink></div>
+    </div>
+
+    <main v-else class="wrap mc-layout">
       <div class="mc-main">
         <nav class="mc-tabs">
           <button v-for="tab in tabs" :key="tab.id" :class="{active: activeTab === tab.id}" @click="activeTab = tab.id">{{ tab.label }}</button>
@@ -129,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { api } from '../services/api';
 import TeamLogo from '../components/TeamLogo.vue';
@@ -174,13 +178,15 @@ function oddKey(o:any){return `${o.bookmakerId||0}-${o.marketId||0}-${o.label}`}
 function predictionPath(id:string){return `/predictions/${id}`}
 function standingName(id:any){return id===home.value.externalId?home.value.name:id===away.value.externalId?away.value.name:'Team'}
 async function load(){
+  const id=String(route.params.id||'').trim();
+  if(!id){ match.value=null; loading.value=false; return; }
   loading.value=true;
   try{
-    const id=String(route.params.id);
     const [m,o,p,r]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds`),api.get('/predictions?limit=100'),api.get(`/matches/${id}/research`)]);
     match.value=m.data; odds.value=o.data||[]; predictions.value=(p.data||[]).filter((x:any)=>String(x.matchId?._id||x.matchId)===id); research.value=r.data||{};
   } catch(e){ match.value=null; } finally { loading.value=false; }
 }
-onMounted(async () => { await load(); refreshTimer = window.setInterval(async () => { if (match.value?.status === 'live') { try { const id=String(route.params.id); const [m,o]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds?mode=inplay`)]); match.value=m.data; if ((o.data||[]).length) odds.value=o.data; } catch {} } }, 30000); });
+watch(() => route.params.id, async () => { activeTab.value='overview'; await load(); });
+onMounted(async () => { await load(); refreshTimer = window.setInterval(async () => { if (match.value?.status === 'live') { try { const id=String(route.params.id||'').trim(); if(!id) return; const [m,o]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds?mode=inplay`)]); match.value=m.data; if ((o.data||[]).length) odds.value=o.data; } catch {} } }, 30000); });
 onUnmounted(() => { if (refreshTimer) window.clearInterval(refreshTimer); });
 </script>
