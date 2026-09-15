@@ -150,6 +150,43 @@ footer{background:linear-gradient(145deg,#0d1729,#101a2e 60%,#1d172a)}
 .home-explore-card b{font-size:11px}.explore-pink b{color:#ed275f}.explore-purple b{color:#7655e8}.explore-blue b{color:#2796eb}
 @media(max-width:850px){.home-explore{margin-top:18px;padding:17px}.home-explore-head{align-items:flex-start;flex-direction:column;gap:8px}.home-explore-grid{grid-template-columns:1fr}.home-explore-tag{font-size:11px}}
 
+/* Football Centre layout primitives — keep match cards as real grid/flex components. */
+.prediction-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;width:100%;}
+.prediction-match-card{display:block;min-width:0;width:100%;box-sizing:border-box;text-decoration:none;color:inherit;background:#fff;border:1px solid #dfe5ec;box-shadow:0 8px 24px rgba(16,26,46,.055);}
+.football-match-card{overflow:hidden;}
+.football-match-card .pmc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.football-match-card .pmc-league{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#536178;font-weight:850;}
+.football-match-card .pmc-league-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#ed275f;}
+.football-match-card .status-badge{display:inline-flex;align-items:center;justify-content:center;flex:none;padding:4px 7px;border-radius:99px;font-size:7px;font-weight:900;letter-spacing:.04em;background:#eef4ff;color:#3677d8;}
+.football-match-card .status-badge.live{background:#eafbf3;color:#159463;}
+.football-match-card .status-badge.finished{background:#f0f2f5;color:#68758a;}
+.football-match-card .pmc-time{color:#8993a4;font-weight:750;}
+.football-match-card .pmc-teams{display:grid;align-items:center;text-align:center;}
+.football-match-card .pmc-teams>div{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.football-match-card .pmc-teams b{display:block;max-width:100%;margin-top:7px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.football-match-card .pmc-teams small{display:block;margin-top:3px;color:#9aa3b1;font-weight:850;letter-spacing:.05em;}
+.football-match-card .pmc-score{gap:5px;}
+.football-match-card .pmc-score strong{line-height:1;}
+.football-match-card .pmc-score span{color:#8b95a5;font-weight:750;white-space:nowrap;}
+.football-match-card .pmc-prediction{border:1px solid #edf0f3;border-radius:12px;}
+.football-match-card .pmc-prediction.premium{background:linear-gradient(135deg,#fff8fb,#faf7ff);border-color:#f0dbe4;}
+.football-match-card .pmc-prediction-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#536178;font-weight:900;letter-spacing:.02em;}
+.football-match-card .pmc-pick{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;}
+.football-match-card .pmc-pick strong{min-width:0;line-height:1.2;}
+.football-match-card .pmc-pick span{flex:none;border-radius:8px;background:#17243b;color:#fff;font-weight:900;}
+.football-match-card .pmc-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:9px;}
+.football-match-card .pmc-metrics span{min-width:0;border-left:1px solid #e9edf2;}
+.football-match-card .pmc-metrics span:first-child{border-left:0;}
+.football-match-card .pmc-metrics small,.football-match-card .pmc-metrics b{display:block;}
+.football-match-card .pmc-metrics small{color:#929baa;}
+.football-match-card .pmc-metrics b{margin-top:3px;color:#25324a;}
+.football-match-card .pmc-locked,.football-match-card .pmc-preparing{display:flex;align-items:center;gap:9px;margin-top:8px;}
+.football-match-card .pmc-locked>span,.football-match-card .pmc-preparing>span{display:grid;place-items:center;width:30px;height:30px;flex:none;border-radius:9px;background:#fff0f4;}
+.football-match-card .pmc-locked strong,.football-match-card .pmc-preparing strong{display:block;font-size:10px;}
+.football-match-card .pmc-locked small,.football-match-card .pmc-preparing small{display:block;margin-top:3px;color:#8993a4;font-size:8px;line-height:1.4;}
+.football-match-card .pmc-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #edf0f3;color:#8993a4;}
+.football-match-card .pmc-footer b{color:#17243b;white-space:nowrap;}
+
 /* Football Centre — match-centre redesign */
 .football-centre-hero{position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:22px;padding:32px 34px 30px;background:linear-gradient(125deg,#17243b 0%,#202e4c 58%,#381d35 100%);border-radius:20px;color:#fff;box-shadow:0 18px 45px rgba(16,26,46,.14)}
 .football-centre-hero:after{content:'';position:absolute;right:-90px;top:-120px;width:330px;height:330px;border:1px solid rgba(255,255,255,.08);border-radius:50%;box-shadow:0 0 0 50px rgba(255,255,255,.025),0 0 0 100px rgba(255,255,255,.018);pointer-events:none}
