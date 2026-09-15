@@ -31,7 +31,7 @@
                 <line v-for="y in [30,85,140,195,250]" :key="y" x1="0" :y1="y" x2="760" :y2="y" class="grid-line"/>
                 <line x1="0" y1="140" x2="760" y2="140" class="zero-line"/>
                 <g v-for="(d,i) in daily" :key="d.date">
-                  <rect :x="barX(i)" :y="barY(d.profit)" width="{{barWidth}}" :height="barHeight(d.profit)" :class="d.profit>=0?'bar-positive':'bar-negative'" rx="2"/>
+                  <rect :x="barX(i)" :y="barY(d.profit)" :width="barWidth" :height="barHeight(d.profit)" :class="d.profit>=0?'bar-positive':'bar-negative'" rx="2"/>
                 </g>
                 <polyline :points="ratePoints" class="rate-line"/>
                 <circle v-for="(d,i) in daily" :key="'c'+d.date" :cx="pointX(i)" :cy="rateY(d.winRate)" r="3.2" class="rate-point"/>
@@ -64,14 +64,7 @@
           <div v-else class="trend-empty">Prediction trends will appear after settled tips are recorded.</div>
         </section>
 
-        <section class="trend-panel explore-panel">
-          <div class="explore-head"><div><span class="eyebrow">⚡ Explore BraTipsters</span><p>Get the most out of BraTipsters with helpful guides, latest updates and answers to your questions.</p></div><span>Better insights. Smarter bets.</span></div>
-          <div class="explore-grid">
-            <RouterLink to="/how-to-use" class="explore-card pink-card"><i>▮</i><div><strong>How to use BraTipsters</strong><p>Learn how to find matches, read predictions, compare tipsters and use odds research.</p><b>Start Guide →</b></div></RouterLink>
-            <RouterLink to="/whats-new" class="explore-card purple-card"><i>◆</i><div><strong>What's New</strong><p>See the latest features, automatic Bet of the Day and improvements across the platform.</p><b>View Updates →</b></div></RouterLink>
-            <RouterLink to="/faq" class="explore-card blue-card"><i>?</i><div><strong>FAQ</strong><p>Quick answers about predictions, results, Premium, tipsters and responsible betting.</p><b>Get Answers →</b></div></RouterLink>
-          </div>
-        </section>
+
       </template>
     </div>
   </main>

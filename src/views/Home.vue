@@ -108,6 +108,31 @@
         <div class="premium-callout"><span>★</span><div><b>Go deeper with Premium</b><p>Match research, market intelligence and premium picks.</p><RouterLink to="/subscription">See plans →</RouterLink></div></div>
       </aside>
     </section>
+
+    <section class="home-explore wrap" aria-labelledby="explore-bratipsters-title">
+      <div class="home-explore-head">
+        <div>
+          <span class="eyebrow">⚡ Explore BraTipsters</span>
+          <h2 id="explore-bratipsters-title">Get more from BraTipsters</h2>
+          <p>Helpful guides, the latest updates and quick answers to help you get the most out of the platform.</p>
+        </div>
+        <span class="home-explore-tag">Better insights. Smarter bets.</span>
+      </div>
+      <div class="home-explore-grid">
+        <RouterLink to="/how-to-use" class="home-explore-card explore-pink">
+          <span class="home-explore-icon">▮</span>
+          <div><strong>How to use BraTipsters</strong><p>Learn how to find matches, read predictions, compare tipsters and use odds research.</p><b>Start Guide →</b></div>
+        </RouterLink>
+        <RouterLink to="/whats-new" class="home-explore-card explore-purple">
+          <span class="home-explore-icon">◆</span>
+          <div><strong>What's New</strong><p>See the latest features, automatic Bet of the Day and improvements across the platform.</p><b>View Updates →</b></div>
+        </RouterLink>
+        <RouterLink to="/faq" class="home-explore-card explore-blue">
+          <span class="home-explore-icon">?</span>
+          <div><strong>FAQ</strong><p>Quick answers about predictions, results, Premium, tipsters and responsible betting.</p><b>Get Answers →</b></div>
+        </RouterLink>
+      </div>
+    </section>
   </div>
 </template>
 
