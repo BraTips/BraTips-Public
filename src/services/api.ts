@@ -23,7 +23,7 @@ function cacheTtl(path:string){
   return 2*60_000;
 }
 function cacheAllowed(path:string){
-  if(accessToken && (path.startsWith('/auth/') || path.startsWith('/me/'))) return false;
+  if(accessToken && (path.startsWith('/auth/') || path.startsWith('/me/') || path.startsWith('/predictions') || path.startsWith('/prediction-history'))) return false;
   if(path.includes('/admin/')) return false;
   return true;
 }
