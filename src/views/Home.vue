@@ -82,26 +82,11 @@
           </div>
         </section>
 
-        <section class="home-panel trend-panel">
-          <div class="panel-head"><div><span class="eyebrow">Market intelligence</span><h2>Prediction Trends</h2></div><RouterLink to="/picks" class="text-link">Explore tips →</RouterLink></div>
-          <div v-if="trends.length" class="trend-grid">
-            <RouterLink v-for="(t,i) in trends" :key="t.prediction" to="/picks" class="trend-card">
-              <div class="trend-rank">#{{ i+1 }}</div><div class="trend-main"><b>{{ t.prediction }}</b><span>{{ t.tips }} settled tips · {{ Math.round(t.winRate) }}% win rate</span></div><strong :class="Number(t.profit)>=0?'positive':'negative'">{{ Number(t.profit)>=0?'+':'' }}{{ Number(t.profit).toFixed(1) }}</strong>
-            </RouterLink>
-          </div>
-          <div v-else class="empty-state">Prediction trends will appear as tracked tips accumulate.</div>
-        </section>
-
         <section class="tool-grid">
           <RouterLink to="/dropping-odds" class="tool-card drop-tool"><span class="tool-icon">↓</span><div><small>Market signal</small><h3>Dropping Odds</h3><p>Find selections whose prices are moving lower.</p></div><b>→</b></RouterLink>
           <RouterLink to="/bet-of-the-day" class="tool-card"><span class="tool-icon">✦</span><div><small>Daily feature</small><h3>Bet of the Day</h3><p>Follow today's highlighted BraTipsters selections.</p></div><b>→</b></RouterLink>
           <RouterLink to="/history" class="tool-card"><span class="tool-icon">↗</span><div><small>Track record</small><h3>Prediction History</h3><p>See settled picks and the public record.</p></div><b>→</b></RouterLink>
           <RouterLink to="/subscription" class="tool-card premium-tool"><span class="tool-icon">★</span><div><small>Premium</small><h3>Unlock BraTipsters</h3><p>Access deeper market and prediction research.</p></div><b>→</b></RouterLink>
-        </section>
-        <section class="home-info-grid">
-          <RouterLink to="/how-to-use" class="home-info-card"><span class="tool-icon">?</span><div><small>Getting started</small><h3>How to use BraTipsters</h3><p>Learn how to find matches, read predictions, compare tipsters and use odds research.</p></div><b>→</b></RouterLink>
-          <RouterLink to="/whats-new" class="home-info-card"><span class="tool-icon">✦</span><div><small>Latest updates</small><h3>What's New</h3><p>See the newest features, automatic Bet of the Day and improvements across the platform.</p></div><b>→</b></RouterLink>
-          <RouterLink to="/faq" class="home-info-card"><span class="tool-icon">Q&A</span><div><small>Need answers?</small><h3>FAQ</h3><p>Quick answers about predictions, results, Premium, tipsters and responsible betting.</p></div><b>→</b></RouterLink>
         </section>
       </main>
 
@@ -132,7 +117,7 @@ import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import TeamLogo from '../components/TeamLogo.vue'
 
-const matches=ref<any[]>([]), liveMatches=ref<any[]>([]), bot=ref<any[]>([]), topTipsters=ref<any[]>([]), trends=ref<any[]>([]), dropCount=ref(0), settledWinRate=ref(0)
+const matches=ref<any[]>([]), liveMatches=ref<any[]>([]), bot=ref<any[]>([]), topTipsters=ref<any[]>([]), dropCount=ref(0), settledWinRate=ref(0)
 const displayMatches=computed(()=>[...liveMatches.value,...matches.value.filter(x=>x.status!=='live')].slice(0,8))
 // Per-section loading flags: only true until that section has SOME data (cached or
 // fresh) to show, so a repeat visit renders instantly from cache with no skeleton flash,
@@ -177,7 +162,6 @@ onMounted(async()=>{
   // not cached (see cacheTtl in services/api.ts) and just load in the background.
   api.get('/matches/live').then((r:any)=>{liveMatches.value=r.data||[]}).catch(()=>{})
   api.get('/prediction-history?limit=1').then((r:any)=>{settledWinRate.value=Math.round(Number(r.stats?.winRate||0))}).catch(()=>{})
-  api.getSWR('/prediction-trends', (fresh:any)=>{trends.value=fresh.data||[]}).then((r:any)=>{trends.value=r.data||[]}).catch(()=>{})
   api.get('/dropping-odds?minDrop=5').then((r:any)=>{dropCount.value=(r.data||[]).length}).catch(()=>{})
 })
 </script>
