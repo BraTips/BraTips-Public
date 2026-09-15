@@ -39,6 +39,14 @@ function writeCache(path:string,data:any,ttl:number){
 }
 export function clearPublicCache(){memoryCache.clear();try{for(let i=sessionStorage.length-1;i>=0;i--){const k=sessionStorage.key(i);if(k?.startsWith(cachePrefix))sessionStorage.removeItem(k)}}catch{} }
 
+// Returns cached data even if its TTL has expired, so the UI never has to sit on a blank
+// screen just because a 30s-old cache entry ticked over.
+function peekCache(path:string){
+  const hit=memoryCache.get(path); if(hit) return hit.data;
+  try{const raw=sessionStorage.getItem(cachePrefix+path); if(raw)return (JSON.parse(raw) as CacheEntry).data;}catch{}
+  return null;
+}
+
 async function request(path:string, options:RequestInit={}, cache=true){
   const isGet=!options.method || options.method.toUpperCase()==='GET';
   const ttl=cache && isGet && cacheAllowed(path) ? cacheTtl(path) : 0;
@@ -81,4 +89,22 @@ async function request(path:string, options:RequestInit={}, cache=true){
   if(ttl)writeCache(path,d,ttl);
   return d;
 }
-export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'POST',body:JSON.stringify(b)},false)},patch:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'PATCH',body:JSON.stringify(b)},false)},delete:(p:string)=>{clearPublicCache();return request(p,{method:'DELETE'},false)}};
+export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'POST',body:JSON.stringify(b)},false)},patch:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'PATCH',body:JSON.stringify(b)},false)},delete:(p:string)=>{clearPublicCache();return request(p,{method:'DELETE'},false)},
+  /**
+   * Stale-while-revalidate GET, for screens (like Home) that should never show
+   * a blank/loading flash on a repeat visit.
+   * - If we have any cached copy (even an expired one), resolve with it immediately.
+   * - Always kicks off a real request in the background; if that returns different
+   *   data, `onFresh` is called so the view can quietly swap it in.
+   * - If there's no cached copy at all, it just behaves like a normal awaited GET.
+   */
+  getSWR<T=any>(p:string, onFresh?:(data:T)=>void):Promise<T>{
+    const stale=peekCache(p);
+    const fresh=request(p).then(d=>{
+      if(onFresh && JSON.stringify(d)!==JSON.stringify(stale)) onFresh(d);
+      return d;
+    });
+    if(stale!==null){ fresh.catch(()=>{}); return Promise.resolve(stale); }
+    return fresh;
+  }
+};

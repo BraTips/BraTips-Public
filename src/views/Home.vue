@@ -35,36 +35,50 @@
         </div>
 
         <section class="feature-feed">
-          <RouterLink v-for="p in bot" :key="p._id" :to="'/matches/' + matchId(p)" class="feature-row">
-            <div class="feature-time">
-              <b>{{ kickoffTime(p) }}</b>
-              <small>{{ leagueName(p) }}</small>
+          <template v-if="loading.bot">
+            <div class="feature-row skeleton-row" v-for="i in 3" :key="'sk-'+i">
+              <div class="skel skel-time"></div><div class="skel skel-teams"></div><div class="skel skel-pick"></div>
             </div>
-            <div class="feature-teams">
-              <div><TeamLogo :src="homeLogo(p)" :name="homeName(p)" size="sm"/><b>{{ homeName(p) }}</b></div>
-              <span>vs</span>
-              <div><b>{{ awayName(p) }}</b><TeamLogo :src="awayLogo(p)" :name="awayName(p)" size="sm"/></div>
-            </div>
-            <div class="feature-pick">
-              <small>Bet of the Day</small>
-              <b>{{ p.prediction }}</b>
-              <span v-if="p.odds">{{ Number(p.odds).toFixed(2) }}</span>
-            </div>
-            <div class="row-arrow">›</div>
-          </RouterLink>
-          <div v-if="!bot.length" class="empty-state">No Bet of the Day picks have been published yet.</div>
+          </template>
+          <template v-else>
+            <RouterLink v-for="p in bot" :key="p._id" :to="'/matches/' + matchId(p)" class="feature-row">
+              <div class="feature-time">
+                <b>{{ kickoffTime(p) }}</b>
+                <small>{{ leagueName(p) }}</small>
+              </div>
+              <div class="feature-teams">
+                <div><TeamLogo :src="homeLogo(p)" :name="homeName(p)" size="sm"/><b>{{ homeName(p) }}</b></div>
+                <span>vs</span>
+                <div><b>{{ awayName(p) }}</b><TeamLogo :src="awayLogo(p)" :name="awayName(p)" size="sm"/></div>
+              </div>
+              <div class="feature-pick">
+                <small>Bet of the Day</small>
+                <b>{{ p.prediction }}</b>
+                <span v-if="p.odds">{{ Number(p.odds).toFixed(2) }}</span>
+              </div>
+              <div class="row-arrow">›</div>
+            </RouterLink>
+            <div v-if="!bot.length" class="empty-state">No Bet of the Day picks have been published yet.</div>
+          </template>
         </section>
 
         <section class="home-panel">
           <div class="panel-head"><div><span class="eyebrow">Live & upcoming</span><h2>More Tips, Stats & Live Scores</h2></div><RouterLink to="/matches" class="text-link">View all matches →</RouterLink></div>
           <div class="match-list">
-            <RouterLink v-for="m in displayMatches" :key="m._id" :to="'/matches/' + m._id" class="compact-match">
-              <div class="compact-time" :class="{ live: m.status === 'live' }"><b>{{ m.status === 'live' ? 'LIVE' : kickoff(m.kickoff) }}</b><small v-if="m.status === 'live'">{{ m.homeScore }}:{{ m.awayScore }}</small></div>
-              <div class="compact-teams"><span><TeamLogo :src="teamLogo(m.homeTeamId)" :name="teamName(m.homeTeamId)" size="sm"/>{{ teamName(m.homeTeamId) }}</span><span><TeamLogo :src="teamLogo(m.awayTeamId)" :name="teamName(m.awayTeamId)" size="sm"/>{{ teamName(m.awayTeamId) }}</span></div>
-              <div class="compact-tip" v-if="firstOdd(m)"><small>{{ firstOdd(m).marketName || 'Market' }}</small><b>{{ firstOdd(m).label }}</b><strong>{{ Number(firstOdd(m).value).toFixed(2) }}</strong></div>
-              <div class="compact-icons"><span v-if="m.odds && m.odds.length">ODDS</span><span v-if="m.status === 'live'" class="live-dot">●</span><b>›</b></div>
-            </RouterLink>
-            <div v-if="!displayMatches.length" class="empty-state">No matches available right now.</div>
+            <template v-if="loading.matches">
+              <div class="compact-match skeleton-row" v-for="i in 4" :key="'skm-'+i">
+                <div class="skel skel-time"></div><div class="skel skel-teams"></div><div class="skel skel-pick"></div>
+              </div>
+            </template>
+            <template v-else>
+              <RouterLink v-for="m in displayMatches" :key="m._id" :to="'/matches/' + m._id" class="compact-match">
+                <div class="compact-time" :class="{ live: m.status === 'live' }"><b>{{ m.status === 'live' ? 'LIVE' : kickoff(m.kickoff) }}</b><small v-if="m.status === 'live'">{{ m.homeScore }}:{{ m.awayScore }}</small></div>
+                <div class="compact-teams"><span><TeamLogo :src="teamLogo(m.homeTeamId)" :name="teamName(m.homeTeamId)" size="sm"/>{{ teamName(m.homeTeamId) }}</span><span><TeamLogo :src="teamLogo(m.awayTeamId)" :name="teamName(m.awayTeamId)" size="sm"/>{{ teamName(m.awayTeamId) }}</span></div>
+                <div class="compact-tip" v-if="firstOdd(m)"><small>{{ firstOdd(m).marketName || 'Market' }}</small><b>{{ firstOdd(m).label }}</b><strong>{{ Number(firstOdd(m).value).toFixed(2) }}</strong></div>
+                <div class="compact-icons"><span v-if="m.odds && m.odds.length">ODDS</span><span v-if="m.status === 'live'" class="live-dot">●</span><b>›</b></div>
+              </RouterLink>
+              <div v-if="!displayMatches.length" class="empty-state">No matches available right now.</div>
+            </template>
           </div>
         </section>
 
@@ -78,12 +92,19 @@
 
       <aside class="home-right">
         <div class="right-heading"><div><span class="eyebrow">Performance</span><h2>Tipster Stats</h2></div><RouterLink to="/tipsters">All →</RouterLink></div>
-        <RouterLink v-for="t in topTipsters" :key="t._id" :to="'/tipsters/' + t.username" class="tipster-stat-card">
-          <div class="tipster-avatar">{{ initials(t.username) }}</div>
-          <div class="tipster-info"><b>{{ t.username }}</b><small>{{ t.wins || 0 }} wins · {{ t.losses || 0 }} losses</small><div class="streak"><span v-for="i in streakDots(t)" :key="i" :class="i <= Number(t.currentStreak || 0) ? 'w' : 'l'">{{ i <= Number(t.currentStreak || 0) ? 'W' : '·' }}</span></div></div>
-          <strong :class="Number(t.roi || 0) >= 0 ? 'positive' : 'negative'">{{ Number(t.roi || 0) >= 0 ? '+' : '' }}{{ Number(t.roi || 0).toFixed(1) }}%</strong>
-        </RouterLink>
-        <div v-if="!topTipsters.length" class="empty-state">Tipster performance will appear here as results accumulate.</div>
+        <template v-if="loading.tipsters">
+          <div class="tipster-stat-card skeleton-row" v-for="i in 4" :key="'skt-'+i">
+            <div class="skel skel-avatar"></div><div class="skel skel-teams"></div>
+          </div>
+        </template>
+        <template v-else>
+          <RouterLink v-for="t in topTipsters" :key="t._id" :to="'/tipsters/' + t.username" class="tipster-stat-card">
+            <div class="tipster-avatar">{{ initials(t.username) }}</div>
+            <div class="tipster-info"><b>{{ t.username }}</b><small>{{ t.wins || 0 }} wins · {{ t.losses || 0 }} losses</small><div class="streak" :title="(t.wins||0)+' wins, '+(t.losses||0)+' losses'"><span v-for="(isWin, i) in winLossDots(t)" :key="i" :class="isWin ? 'w' : 'l'">{{ isWin ? 'W' : 'L' }}</span></div></div>
+            <strong :class="Number(t.roi || 0) >= 0 ? 'positive' : 'negative'">{{ Number(t.roi || 0) >= 0 ? '+' : '' }}{{ Number(t.roi || 0).toFixed(1) }}%</strong>
+          </RouterLink>
+          <div v-if="!topTipsters.length" class="empty-state">Tipster performance will appear here as results accumulate.</div>
+        </template>
         <div class="premium-callout"><span>★</span><div><b>Go deeper with Premium</b><p>Match research, market intelligence and premium picks.</p><RouterLink to="/subscription">See plans →</RouterLink></div></div>
       </aside>
     </section>
@@ -98,6 +119,10 @@ import TeamLogo from '../components/TeamLogo.vue'
 
 const matches=ref<any[]>([]), liveMatches=ref<any[]>([]), bot=ref<any[]>([]), topTipsters=ref<any[]>([]), dropCount=ref(0), settledWinRate=ref(0)
 const displayMatches=computed(()=>[...liveMatches.value,...matches.value.filter(x=>x.status!=='live')].slice(0,8))
+// Per-section loading flags: only true until that section has SOME data (cached or
+// fresh) to show, so a repeat visit renders instantly from cache with no skeleton flash,
+// while a first-ever visit still gets a skeleton instead of an empty page.
+const loading=ref({bot:true, matches:true, tipsters:true})
 function teamName(t:any){return t?.name||'Team'}
 function teamLogo(t:any){return t?.logo||''}
 function homeTeam(p:any){return p?.matchId?.homeTeamId||{}}
@@ -112,14 +137,31 @@ function kickoff(v:any){return v?new Date(v).toLocaleTimeString([], {hour:'2-dig
 function kickoffTime(p:any){return kickoff(p?.matchId?.kickoff)}
 function firstOdd(m:any){return Array.isArray(m?.odds)&&m.odds.length?m.odds[0]:null}
 function initials(v:string){return (v||'BT').slice(0,2).toUpperCase()}
-function streakDots(t:any){return Array.from({length:10},(_,i)=>i+1)}
+// Small win/loss strip next to each tipster: proportion of green (win) vs red (loss)
+// boxes reflects their actual wins/losses ratio, not an unrelated "current streak".
+function winLossDots(t:any){
+  const total=10
+  const wins=Number(t.wins||0), losses=Number(t.losses||0), played=wins+losses
+  const greenCount=played>0 ? Math.round((wins/played)*total) : 0
+  return Array.from({length:total},(_,i)=>i<greenCount)
+}
 onMounted(async()=>{
-  const [m,l,b,t,h]=await Promise.allSettled([api.get('/matches/today'),api.get('/matches/live'),api.get('/bet-of-day'),api.get('/tipsters'),api.get('/prediction-history?limit=1')])
-  if(m.status==='fulfilled')matches.value=m.value.data||[]
-  if(l.status==='fulfilled')liveMatches.value=l.value.data||[]
-  if(b.status==='fulfilled')bot.value=b.value.data||[]
-  if(t.status==='fulfilled')topTipsters.value=(t.value.data||[]).slice(0,6)
-  if(h.status==='fulfilled')settledWinRate.value=Math.round(Number(h.value.stats?.winRate||0))
-  try{const d=await api.get('/dropping-odds?minDrop=5');dropCount.value=(d.data||[]).length}catch{}
+  // Bet of the Day + today's matches: stale-while-revalidate. Any cached copy renders
+  // instantly (no skeleton), and if the background refetch comes back different, the
+  // view quietly swaps it in — no reload, no flash.
+  api.getSWR('/bet-of-day', (fresh:any)=>{bot.value=fresh.data||[]})
+    .then((r:any)=>{bot.value=r.data||[]}).catch(()=>{}).finally(()=>{loading.value.bot=false})
+
+  api.getSWR('/matches/today', (fresh:any)=>{matches.value=fresh.data||[]})
+    .then((r:any)=>{matches.value=r.data||[]}).catch(()=>{}).finally(()=>{loading.value.matches=false})
+
+  api.getSWR('/tipsters', (fresh:any)=>{topTipsters.value=(fresh.data||[]).slice(0,6)})
+    .then((r:any)=>{topTipsters.value=(r.data||[]).slice(0,6)}).catch(()=>{}).finally(()=>{loading.value.tipsters=false})
+
+  // Live matches, drop count and win rate change constantly, so they're intentionally
+  // not cached (see cacheTtl in services/api.ts) and just load in the background.
+  api.get('/matches/live').then((r:any)=>{liveMatches.value=r.data||[]}).catch(()=>{})
+  api.get('/prediction-history?limit=1').then((r:any)=>{settledWinRate.value=Math.round(Number(r.stats?.winRate||0))}).catch(()=>{})
+  api.get('/dropping-odds?minDrop=5').then((r:any)=>{dropCount.value=(r.data||[]).length}).catch(()=>{})
 })
 </script>

@@ -6,32 +6,42 @@
           <img src="/logo.svg" alt="BraTipsters" />
         </RouterLink>
 
-        <nav class="desktop-nav" aria-label="Primary navigation">
+        <nav class="desktop-nav" aria-label="Primary navigation" ref="desktopNavEl">
           <RouterLink to="/matches">Matches</RouterLink>
-          <details class="nav-menu">
-            <summary>Tips <span>⌄</span></summary>
-            <div class="nav-dropdown">
-              <RouterLink to="/picks">Latest Tips</RouterLink>
-              <RouterLink to="/bet-of-the-day">Bet of the Day</RouterLink>
-              <RouterLink to="/history">Tip History</RouterLink>
-            </div>
-          </details>
-          <details class="nav-menu">
-            <summary>Tipsters <span>⌄</span></summary>
-            <div class="nav-dropdown">
-              <RouterLink to="/tipsters">All Tipsters</RouterLink>
-              <RouterLink to="/tipster-rankings">Monthly Rankings</RouterLink>
-              <RouterLink to="/tipster-signup">Become a Tipster</RouterLink>
-            </div>
-          </details>
-          <details class="nav-menu">
-            <summary>Tools <span>⌄</span></summary>
-            <div class="nav-dropdown">
-              <RouterLink to="/dropping-odds">Dropping Odds</RouterLink>
-              <RouterLink to="/how-to-use">How to Use</RouterLink>
-              <RouterLink to="/faq">FAQ</RouterLink>
-            </div>
-          </details>
+
+          <div class="nav-menu" :class="{open: openMenu==='tips'}">
+            <button type="button" class="nav-menu-trigger" :aria-expanded="openMenu==='tips'" @click="toggleMenu('tips')">Tips <span>⌄</span></button>
+            <transition name="dropdown">
+              <div v-if="openMenu==='tips'" class="nav-dropdown" @click="closeMenu">
+                <RouterLink to="/picks">Latest Tips</RouterLink>
+                <RouterLink to="/bet-of-the-day">Bet of the Day</RouterLink>
+                <RouterLink to="/history">Tip History</RouterLink>
+              </div>
+            </transition>
+          </div>
+
+          <div class="nav-menu" :class="{open: openMenu==='tipsters'}">
+            <button type="button" class="nav-menu-trigger" :aria-expanded="openMenu==='tipsters'" @click="toggleMenu('tipsters')">Tipsters <span>⌄</span></button>
+            <transition name="dropdown">
+              <div v-if="openMenu==='tipsters'" class="nav-dropdown" @click="closeMenu">
+                <RouterLink to="/tipsters">All Tipsters</RouterLink>
+                <RouterLink to="/tipster-rankings">Monthly Rankings</RouterLink>
+                <RouterLink to="/tipster-signup">Become a Tipster</RouterLink>
+              </div>
+            </transition>
+          </div>
+
+          <div class="nav-menu" :class="{open: openMenu==='tools'}">
+            <button type="button" class="nav-menu-trigger" :aria-expanded="openMenu==='tools'" @click="toggleMenu('tools')">Tools <span>⌄</span></button>
+            <transition name="dropdown">
+              <div v-if="openMenu==='tools'" class="nav-dropdown" @click="closeMenu">
+                <RouterLink to="/dropping-odds">Dropping Odds</RouterLink>
+                <RouterLink to="/how-to-use">How to Use</RouterLink>
+                <RouterLink to="/faq">FAQ</RouterLink>
+              </div>
+            </transition>
+          </div>
+
           <RouterLink to="/premium-features" class="premium-nav">Premium</RouterLink>
         </nav>
 
@@ -83,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import {RouterLink,RouterView,useRoute} from 'vue-router';
 import {useAuth} from './stores/auth';
 import NotificationBell from './components/NotificationBell.vue';
@@ -91,6 +101,22 @@ const auth=useAuth();
 const route=useRoute();
 const mobileOpen=ref(false);
 const closeMobile=()=>{mobileOpen.value=false};
-watch(()=>route.path, closeMobile);
+
+// Desktop "Tips / Tipsters / Tools" dropdowns.
+// Only one can be open at a time; clicking the trigger again, picking a link,
+// navigating, pressing Escape, or clicking anywhere outside all close it.
+const openMenu=ref<string|null>(null);
+const desktopNavEl=ref<HTMLElement|null>(null);
+function toggleMenu(name:string){openMenu.value = openMenu.value===name ? null : name}
+function closeMenu(){openMenu.value=null}
+function onDocClick(e:MouseEvent){
+  if(!openMenu.value) return;
+  if(desktopNavEl.value && !desktopNavEl.value.contains(e.target as Node)) closeMenu();
+}
+function onKeydown(e:KeyboardEvent){ if(e.key==='Escape') closeMenu(); }
+onMounted(()=>{document.addEventListener('click', onDocClick); document.addEventListener('keydown', onKeydown)});
+onUnmounted(()=>{document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKeydown)});
+
+watch(()=>route.path, ()=>{closeMobile(); closeMenu();});
 const minimalChrome=computed(()=>['/login','/signup','/tipster-signup'].includes(route.path));
 </script>
