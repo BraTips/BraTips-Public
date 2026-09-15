@@ -12,6 +12,13 @@
           <div class="profile-record"><span>Current streak</span><b>{{ profile.currentStreak || 0 }}</b><small>Best {{ profile.longestStreak || 0 }}</small></div>
         </div>
 
+        <div v-if="recentForm.length" class="recent-form-row">
+          <span>Recent form</span>
+          <div class="streak" title="Last settled results, oldest to newest (left to right)">
+            <span v-for="(isWin, i) in recentForm" :key="i" :class="isWin ? 'w' : 'l'">{{ isWin ? 'W' : 'L' }}</span>
+          </div>
+        </div>
+
         <div class="pro-stat-strip profile-stats">
           <div><span>Total tips</span><b>{{ profile.totalTips || 0 }}</b></div>
           <div><span>Wins</span><b>{{ profile.wins || 0 }}</b></div>
@@ -38,6 +45,10 @@ import PickCard from '../components/PickCard.vue';
 const route=useRoute(), router=useRouter(), auth=useAuth();
 const profile=ref<any>(null), picks=ref<any[]>([]), following=ref(false), loading=ref(true), error=ref('');
 const rate=computed(()=>profile.value?.totalTips ? Math.round(profile.value.wins/profile.value.totalTips*1000)/10 : 0);
+// Real recent-form strip (not an estimate): this tipster's actual last 8 settled
+// (won/lost) picks, oldest to newest left-to-right. `picks` already comes sorted
+// most-recent-first from the API, so take the first 8 and reverse for display order.
+const recentForm=computed(()=>picks.value.filter((p:any)=>p.status==='won'||p.status==='lost').slice(0,8).reverse().map((p:any)=>p.status==='won'));
 function play(){ if(auth.isLoggedIn) router.push('/dashboard'); else router.push({path:'/login',query:{redirect:route.fullPath}}); }
 async function loadFollow(){
   following.value=false;
