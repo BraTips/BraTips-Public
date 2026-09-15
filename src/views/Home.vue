@@ -7,10 +7,11 @@
         <RouterLink class="side-item" to="/dropping-odds"><span>↓</span> Dropping Odds <b>{{ dropCount }}</b></RouterLink>
         <RouterLink class="side-item" to="/matches"><span>◉</span> Matches & Odds <b>{{ matches.length }}</b></RouterLink>
         <RouterLink class="side-item" to="/bet-of-the-day"><span>✦</span> Bet of the Day <b>{{ bot.length }}</b></RouterLink>
-        <RouterLink class="side-item" to="/picks"><span>⌁</span> Acca Tips</RouterLink>
-        <RouterLink class="side-item" to="/picks"><span>◎</span> Over 2.5 Tips</RouterLink>
-        <RouterLink class="side-item" to="/picks"><span>◌</span> BTTS Tips</RouterLink>
-        <RouterLink class="side-item" to="/matches"><span>⚑</span> Corners</RouterLink>
+        <RouterLink class="side-item" to="/acca-tips"><span>⌁</span> Acca Tips</RouterLink>
+        <RouterLink class="side-item" to="/over-2-5-tips"><span>◎</span> Over 2.5 Tips</RouterLink>
+        <RouterLink class="side-item" to="/double-chance-tips"><span>◇</span> Double Chance</RouterLink>
+        <RouterLink class="side-item" to="/btts-tips"><span>◌</span> BTTS Tips</RouterLink>
+        <RouterLink class="side-item" to="/corners-tips"><span>⚑</span> Corners</RouterLink>
         <RouterLink class="side-item" to="/tipsters"><span>♙</span> Tipsters</RouterLink>
         <div class="side-divider"></div>
         <RouterLink class="side-mini" to="/history">Prediction history</RouterLink>
@@ -80,7 +81,7 @@
                 <small>{{ p.league || p.matchId?.leagueId?.name || 'Football' }}</small>
               </div>
               <div class="weekly-pick" :class="{locked:p.locked}">
-                <span>{{ p.isPremium ? '★ PREMIUM' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
+                <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? '♛ PREMIUM' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
                 <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ Number(p.odds).toFixed(2) }}</strong>
                 <strong v-else>🔒</strong>
@@ -217,12 +218,12 @@ onMounted(async()=>{
   api.getSWR('/matches/today', (fresh:any)=>{matches.value=fresh.data||[]})
     .then((r:any)=>{matches.value=r.data||[]}).catch(()=>{}).finally(()=>{loading.value.matches=false})
 
-  api.getSWR('/predictions?limit=50&horizon=weekly', (fresh:any)=>{weeklyPredictions.value=fresh.data||[]})
+  api.get('/predictions?limit=50&horizon=weekly&refresh=1')
     .then(async(r:any)=>{
       const first=r.data||[]; weeklyPredictions.value=first;
       const pages=Math.min(Number(r.pagination?.pages||1),5);
       if(pages>1){
-        const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>api.get(`/predictions?limit=50&horizon=weekly&page=${i+2}`)).map(x=>x.catch(()=>({data:[]}))));
+        const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>api.get(`/predictions?limit=50&horizon=weekly&page=${i+2}&refresh=1`)).map(x=>x.catch(()=>({data:[]}))));
         weeklyPredictions.value=[...first,...rest.flatMap((x:any)=>x.data||[])];
       }
     }).catch(()=>{}).finally(()=>{loading.value.weekly=false})
