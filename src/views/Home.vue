@@ -104,7 +104,7 @@
               <RouterLink v-for="m in displayMatches" :key="m._id" :to="'/matches/' + m._id" class="compact-match">
                 <div class="compact-time" :class="{ live: m.status === 'live' }"><b>{{ m.status === 'live' ? 'LIVE' : kickoff(m.kickoff) }}</b><small v-if="m.status === 'live'">{{ m.homeScore }}:{{ m.awayScore }}</small></div>
                 <div class="compact-teams"><span><TeamLogo :src="teamLogo(m.homeTeamId)" :name="teamName(m.homeTeamId)" size="sm"/>{{ teamName(m.homeTeamId) }}</span><span><TeamLogo :src="teamLogo(m.awayTeamId)" :name="teamName(m.awayTeamId)" size="sm"/>{{ teamName(m.awayTeamId) }}</span></div>
-                <div class="compact-tip" v-if="firstOdd(m)"><small>{{ firstOdd(m).marketName || 'Market' }}</small><b>{{ firstOdd(m).label }}</b><strong>{{ Number(firstOdd(m).value).toFixed(2) }}</strong></div>
+                <div class="compact-tip" v-if="firstOdd(m)"><small>{{ m.status === 'live' ? 'BraTipsters Odds' : (firstOdd(m).marketName || 'Market') }}</small><b>{{ firstOdd(m).label }}</b><strong>{{ Number(firstOdd(m).value).toFixed(2) }}</strong></div>
                 <div class="compact-icons"><span v-if="m.odds && m.odds.length">ODDS</span><span v-if="m.status === 'live'" class="live-dot">●</span><b>›</b></div>
               </RouterLink>
               <div v-if="!displayMatches.length" class="empty-state">No matches available right now.</div>
