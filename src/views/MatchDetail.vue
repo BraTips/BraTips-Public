@@ -57,10 +57,10 @@
 
           <div class="mc-panel">
             <div class="mc-panel-head"><div><span class="eyebrow">BraTipsters insight</span><h2>Predictions</h2></div></div>
-            <RouterLink v-for="p in predictions" :key="p._id" :to="predictionPath(p._id)" class="tip-row">
-              <div><b>{{ p.prediction }}</b><span>{{ p.tipsterId?.name || 'BraTipsters tipster' }}</span></div><strong>{{ price(p.odds) }}</strong>
+            <RouterLink v-for="p in predictions" :key="p._id" :to="p.locked ? '/subscription' : predictionPath(p._id)" :class="['tip-row','bratips-detail-prediction',{locked:p.locked}]">
+              <div><b>{{ p.locked ? 'Premium prediction locked' : p.prediction }}</b><span>{{ p.locked ? 'Subscribe to reveal the selection and odds' : (p.systemGenerated ? 'BraTipsters model' : (p.tipsterId?.name || 'BraTipsters tipster')) }}</span></div><strong>{{ p.locked ? '🔒' : price(p.odds) }}</strong>
             </RouterLink>
-            <div v-if="!predictions.length" class="empty compact">No published BraTipsters prediction for this fixture.</div>
+            <div v-if="!predictions.length" class="empty compact">BraTipsters is preparing the model for this fixture. Refresh in a moment.</div>
           </div>
 
           <div class="mc-panel">
@@ -177,8 +177,8 @@ async function load(){
   loading.value=true;
   try{
     const id=String(route.params.id);
-    const [m,o,p,r]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds`),api.get('/predictions?limit=100'),api.get(`/matches/${id}/research`)]);
-    match.value=m.data; odds.value=o.data||[]; predictions.value=(p.data||[]).filter((x:any)=>String(x.matchId?._id||x.matchId)===id); research.value=r.data||{};
+    const [m,o,p,r]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds`),api.get(`/matches/${id}/prediction`),api.get(`/matches/${id}/research`)]);
+    match.value=m.data; odds.value=o.data||[]; predictions.value=p.data||[]; research.value=r.data||{};
   } catch(e){ match.value=null; } finally { loading.value=false; }
 }
 onMounted(async () => { await load(); refreshTimer = window.setInterval(async () => { if (match.value?.status === 'live') { try { const id=String(route.params.id); const [m,o]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds?mode=inplay`)]); match.value=m.data; if ((o.data||[]).length) odds.value=o.data; } catch {} } }, 30000); });
