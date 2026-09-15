@@ -17,15 +17,10 @@
         <RouterLink to="/dropping-odds" class="page-tab-special">View price drops →</RouterLink>
       </div>
 
-      <div class="match-filters">
-        <label class="match-search"><span>⌕</span><input v-model="search" type="search" placeholder="Search team or competition" aria-label="Search matches" /></label>
-        <select v-model="leagueFilter" aria-label="Filter by competition"><option value="">All competitions</option><option v-for="league in leagues" :key="league" :value="league">{{ league }}</option></select>
-      </div>
-
       <div v-if="loading" class="match-intel-list"><div v-for="n in 7" :key="n" class="match-skeleton"></div></div>
       <div v-else-if="error" class="pro-panel error">{{error}} <button class="ghost" @click="load">Try again</button></div>
       <section v-else class="match-intel-list">
-        <RouterLink v-for="m in filteredMatches" :key="m._id" :to="matchPath(m)" class="match-intel-row">
+        <RouterLink v-for="m in matches" :key="m._id" :to="`/matches/${m._id}`" class="match-intel-row">
           <div class="match-intel-top"><span>{{m.leagueId?.name || 'Football'}}</span><span :class="['status-badge',m.status]">{{m.status==='live'?'● LIVE':m.status==='finished'?'FINAL':m.status==='scheduled'?'UPCOMING':m.status}}</span></div>
           <div class="match-intel-main">
             <div class="intel-team home"><TeamLogo :src="m.homeTeamId?.logo" :name="m.homeTeamId?.name" size="sm"/><div><b>{{m.homeTeamId?.name||'Home'}}</b><small>Home</small></div></div>
@@ -34,17 +29,14 @@
           </div>
           <div class="match-intel-bottom"><span>{{dateLabel(m.kickoff)}}</span><div v-if="m.odds?.length" class="odds-pills"><span v-for="o in m.odds.slice(0,4)" :key="o._id"><b>{{o.label}}</b> {{Number(o.value).toFixed(2)}}</span></div><span class="match-open">Match centre →</span></div>
         </RouterLink>
-        <div v-if="!filteredMatches.length" class="pro-panel empty">No football fixtures match these filters. Try another competition or search term.</div>
+        <div v-if="!matches.length" class="pro-panel empty">No football fixtures are available for this view yet.</div>
       </section>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import {computed,onMounted,onUnmounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';
-const tabs=[{v:'today',l:'Today',icon:'◷'},{v:'live',l:'Live',icon:'●'},{v:'scheduled',l:'Upcoming',icon:'→'},{v:'finished',l:'Results',icon:'✓'}];const tab=ref('today'),matches=ref<any[]>([]),loading=ref(true),error=ref(''),search=ref(''),leagueFilter=ref('');
-const leagues=computed(()=>Array.from(new Set(matches.value.map((m:any)=>m.leagueId?.name).filter(Boolean))).sort());
-const filteredMatches=computed(()=>matches.value.filter((m:any)=>{const text=`${m.homeTeamId?.name||''} ${m.awayTeamId?.name||''} ${m.leagueId?.name||''}`.toLowerCase();return (!search.value||text.includes(search.value.toLowerCase()))&&(!leagueFilter.value||m.leagueId?.name===leagueFilter.value)}));
-function matchPath(m:any){return m?._id?`/matches/${encodeURIComponent(String(m._id))}`:'/matches'}
+import {onMounted,onUnmounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';
+const tabs=[{v:'today',l:'Today',icon:'◷'},{v:'live',l:'Live',icon:'●'},{v:'scheduled',l:'Upcoming',icon:'→'},{v:'finished',l:'Results',icon:'✓'}];const tab=ref('today'),matches=ref<any[]>([]),loading=ref(true),error=ref('');
 const time=(v:string)=>v?new Date(v).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';const dateLabel=(v:string)=>v?new Date(v).toLocaleDateString([],{weekday:'short',day:'2-digit',month:'short'}):'';
 let refreshTimer:number|undefined;
 function startPolling(){if(refreshTimer)window.clearInterval(refreshTimer);const ms=tab.value==='live'?15000:tab.value==='today'?60000:300000;refreshTimer=window.setInterval(load,ms)}

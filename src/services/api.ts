@@ -1,6 +1,5 @@
 const API=(import.meta.env.VITE_API_URL||'http://localhost:4000/api/v1').replace(/\/$/,'');
 let refreshPromise:Promise<string|null>|null=null;
-const inFlight=new Map<string,Promise<any>>();
 let accessToken=localStorage.getItem('bratips_access')||'';
 export function setToken(t:string){accessToken=t;if(t)localStorage.setItem('bratips_access',t);else localStorage.removeItem('bratips_access')}
 export function getToken(){return accessToken}
@@ -52,9 +51,6 @@ async function request(path:string, options:RequestInit={}, cache=true){
   const isGet=!options.method || options.method.toUpperCase()==='GET';
   const ttl=cache && isGet && cacheAllowed(path) ? cacheTtl(path) : 0;
   if(ttl){const cached=readCache(path);if(cached!==null)return cached;}
-  const requestKey=isGet ? `${path}|${accessToken ? 'auth' : 'public'}` : '';
-  if(isGet && requestKey && inFlight.has(requestKey)) return inFlight.get(requestKey);
-  const run=async()=>{
   const headers=new Headers(options.headers);
   headers.set('Content-Type','application/json');
   if(accessToken)headers.set('Authorization',`Bearer ${accessToken}`);
@@ -92,10 +88,6 @@ async function request(path:string, options:RequestInit={}, cache=true){
   if(!r.ok)throw new Error(d.message||'Request failed');
   if(ttl)writeCache(path,d,ttl);
   return d;
-  };
-  const promise=run().finally(()=>{if(requestKey)inFlight.delete(requestKey)});
-  if(requestKey)inFlight.set(requestKey,promise);
-  return promise;
 }
 export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'POST',body:JSON.stringify(b)},false)},patch:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'PATCH',body:JSON.stringify(b)},false)},delete:(p:string)=>{clearPublicCache();return request(p,{method:'DELETE'},false)},
   /**
