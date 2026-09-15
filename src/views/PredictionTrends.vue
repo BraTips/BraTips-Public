@@ -51,7 +51,7 @@
         </section>
 
         <section class="trend-panel market-table-panel">
-          <div class="trend-panel-head"><div><h2>Top Performing Markets</h2><p>Markets ranked by tracked profit, with win rate and recent direction.</p></div><RouterLink to="/history" class="trend-action">View All Trends →</RouterLink></div>
+          <div class="trend-panel-head"><div><h2>Top Performing Markets</h2><p>Markets ranked by tracked profit, with win rate and recent direction.</p></div><RouterLink to="/prediction-trends" class="trend-action">View All Trends →</RouterLink></div>
           <div v-if="markets.length" class="market-table">
             <div class="market-table-head"><span>Market</span><span>Total Tips</span><span>Wins</span><span>Win Rate</span><span>Profit/Loss</span><span>Avg. Odds</span><span>Trend</span><span></span></div>
             <div v-for="(m,i) in markets.slice(0,8)" :key="m.market" class="market-row">
@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import {api} from '../services/api';
-const days=ref(30),loading=ref(true),error=ref('');
+const days=ref(365),loading=ref(true),error=ref('');
 const summary=ref<any>({tips:0,wins:0,winRate:0,profit:0,avgOdds:0});
 const markets=ref<any[]>([]),distribution=ref<any[]>([]),daily=ref<any[]>([]);
 const palette=['#ed275f','#7757e8','#2397ee','#18c99a','#ffbd62','#9da8bb'];
