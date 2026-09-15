@@ -1,4 +1,7 @@
+import {useGlobalLoader} from '../composables/feedback';
+
 const API=(import.meta.env.VITE_API_URL||'http://localhost:4000/api/v1').replace(/\/$/,'');
+const globalLoader=useGlobalLoader();
 let refreshPromise:Promise<string|null>|null=null;
 let accessToken=localStorage.getItem('bratips_access')||'';
 export function setToken(t:string){accessToken=t;if(t)localStorage.setItem('bratips_access',t);else localStorage.removeItem('bratips_access')}
@@ -51,44 +54,28 @@ async function request(path:string, options:RequestInit={}, cache=true){
   const isGet=!options.method || options.method.toUpperCase()==='GET';
   const ttl=cache && isGet && cacheAllowed(path) ? cacheTtl(path) : 0;
   if(ttl){const cached=readCache(path);if(cached!==null)return cached;}
-  const headers=new Headers(options.headers);
-  headers.set('Content-Type','application/json');
+  const headers=new Headers(options.headers);headers.set('Content-Type','application/json');
   if(accessToken)headers.set('Authorization',`Bearer ${accessToken}`);
-  let r:Response;
+  globalLoader.start();
   try{
-    r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
+    let r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
+    if(r.status===401&&path!='/auth/refresh'){
+      try{
+        if(!refreshPromise){refreshPromise=(async()=>{try{const rr=await fetchWithTimeout(`${API}/auth/refresh`,{method:'POST',credentials:'include'});if(!rr.ok)return null;const d=await rr.json();if(!d?.accessToken)return null;setToken(d.accessToken);return d.accessToken as string}catch{return null}finally{refreshPromise=null}})();}
+        const freshToken=await refreshPromise;
+        if(freshToken){headers.set('Authorization',`Bearer ${freshToken}`);r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});}else setToken('');
+      }catch{}
+    }
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.message||'Request failed');
+    if(ttl)writeCache(path,d,ttl);
+    return d;
   }catch(e:any){
+    if(e instanceof Error && e.message && !/Failed to fetch|NetworkError/i.test(e.message))throw e;
     throw new Error(e?.name==='AbortError'?'The server took too long to respond. Please try again.':'Unable to reach the BraTipsters server.');
-  }
-  if(r.status===401&&path!='/auth/refresh'){
-    try{
-      if(!refreshPromise){
-        refreshPromise=(async()=>{
-          try{
-            const rr=await fetchWithTimeout(`${API}/auth/refresh`,{method:'POST',credentials:'include'});
-            if(!rr.ok)return null;
-            const d=await rr.json();
-            if(!d?.accessToken)return null;
-            setToken(d.accessToken);
-            return d.accessToken as string;
-          }catch{return null}
-          finally{refreshPromise=null;}
-        })();
-      }
-      const freshToken=await refreshPromise;
-      if(freshToken){
-        headers.set('Authorization',`Bearer ${freshToken}`);
-        r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
-      } else {
-        setToken('');
-      }
-    }catch{}
-  }
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok)throw new Error(d.message||'Request failed');
-  if(ttl)writeCache(path,d,ttl);
-  return d;
+  }finally{globalLoader.stop();}
 }
+
 export const api={get:(p:string)=>request(p),post:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'POST',body:JSON.stringify(b)},false)},patch:(p:string,b:any)=>{clearPublicCache();return request(p,{method:'PATCH',body:JSON.stringify(b)},false)},delete:(p:string)=>{clearPublicCache();return request(p,{method:'DELETE'},false)},
   /**
    * Stale-while-revalidate GET, for screens (like Home) that should never show

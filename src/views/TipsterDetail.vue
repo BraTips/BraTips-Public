@@ -36,6 +36,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import {useConfirm} from '../composables/feedback';
+const {ask}=useConfirm();
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { api } from '../services/api';
@@ -64,7 +66,7 @@ async function load(){
 async function toggleFollow(){
   if(!auth.isLoggedIn){ router.push({path:'/login',query:{redirect:route.fullPath}}); return; }
   try { if(following.value){ await api.delete(`/me/follows/${profile.value.userId}`); following.value=false; } else { await api.post(`/me/follows/${profile.value.userId}`,{}); following.value=true; } }
-  catch(e:any){ alert(e.message); }
+  catch(e:any){ await ask({title:'BraTipsters',message:e?.message||'Unable to complete this action.',confirmText:'Close',cancelText:'Dismiss',danger:true}); }
 }
 watch(()=>route.params.username, load, { immediate:true });
 </script>
