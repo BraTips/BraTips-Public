@@ -72,7 +72,7 @@ async function submit() {
     const safeRedirect=redirect.startsWith('/')&&!redirect.startsWith('//')?redirect:''
     if (safeRedirect) {
       router.push(safeRedirect)
-    } else if (auth.user?.role === 'tipster') {
+    } else if (auth.isTipster) {
       router.push('/tipster-dashboard')
     } else if (auth.user?.role === 'admin') {
       router.push('/dashboard')
