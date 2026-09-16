@@ -1,17 +1,20 @@
-# BraTipsters AIStarterKit Design Implementation
+# BraTipsters + AIStarterKit implementation
 
-Implemented in the existing Vue/Vite BraTipsters public application.
+- BraTips-Public(2) is the source of truth for the navbar, navigation structure, account controls, mobile navigation, branding, and premium subscription card structure.
+- AIStarterKit is used as the visual inspiration for public content surfaces, spacing, gradients, cards, and the tipster workspace.
+- The Vue/Vite architecture and existing API integrations are preserved.
+- Added light/dark theme persistence via localStorage and a navbar theme toggle.
+- Added role-aware routing: tipsters go to `/tipster-dashboard`; normal members go to `/dashboard`.
+- `/dashboard` redirects tipsters to `/tipster-dashboard`; `/tipster-dashboard` redirects normal members to `/dashboard`.
 
-## What changed
-- Applied an AIStarterKit-inspired visual system to the existing BraTipsters public site: purple/indigo gradients, softer surfaces, rounded cards, modern spacing, borders, shadows and responsive styling.
-- Preserved the existing BraTipsters homepage information architecture and API-driven content rather than replacing it with the template's AI/SaaS content.
-- Restyled the existing tipster dashboard into the same AIStarterKit-inspired visual language while retaining its existing API, prediction submission, published-pick, performance, wallet and notification functionality.
-- Added explicit `/tipster-dashboard` routing and role-aware redirects so tipsters land in the tipster workspace while normal members use `/dashboard`.
-- Added an authentication guard for protected dashboard routes.
-- Existing BraTipsters content, routes and backend integration remain the source of truth.
+Run locally:
 
-## Important deployment note
-The current deployment can remain live while this version is tested on a separate Vercel preview deployment. Once verified, the same Vercel project/domain can be updated to this build.
+    npm install
+    npm run build
+    npm run dev
 
-## Validation
-The source was inspected after implementation. A local production build could not be completed in the container because the uploaded `node_modules` was platform-specific and the replacement `npm ci` operation timed out. Run `npm ci` (or `npm install`) and `npm run build` on the deployment machine before production release.
+Deploy the tested build to a staging Vercel deployment before replacing the current production deployment.
+
+
+## Typography update
+The public typography is locked to the BraTips-Public(2) system: Inter/Arial fallback, 16px base size, 1.5 line height, and the original heading/navigation/form/table sizing and weights. AIStarterKit visual styling does not replace the BraTips font system.

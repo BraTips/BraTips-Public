@@ -23,7 +23,7 @@
         <div class="auth-heading">
           <span class="auth-section-label">MEMBER ACCESS</span>
           <h2>Welcome back</h2>
-          <p>Sign in to continue to your BraTipsters dashboard.</p>
+          <p>Sign in and BraTipsters will take you to the correct dashboard for your account.</p>
         </div>
 
         <form class="auth-form" @submit.prevent="submit">
@@ -40,8 +40,9 @@
         </form>
 
         <div class="auth-divider"><span>NEW TO BRATIPS?</span></div>
-        <RouterLink to="/signup" class="auth-secondary">Create your account <b>→</b></RouterLink>
-        <div class="auth-tipster-cta"><span>Already have a strategy to share?</span><RouterLink to="/tipster-signup">Become a tipster</RouterLink></div>
+        <RouterLink to="/signup" class="auth-secondary">Create a member account <b>→</b></RouterLink>
+        <div class="auth-tipster-cta"><span>Want to publish your own picks?</span><RouterLink to="/tipster-signup">Apply to become a tipster</RouterLink></div>
+        <div class="auth-member-note"><strong>Premium member?</strong><span>Use a regular member account to access Premium tips. Tipster status is only for approved publishers.</span></div>
         <p class="auth-footnote">By continuing, you agree to use BraTipsters responsibly and for informational purposes.</p>
       </div>
     </section>
@@ -66,7 +67,17 @@ async function submit() {
   error.value = ''
   try {
     await auth.login(email.value, password.value)
-    const redirect=String(route.query.redirect||''); const safeRedirect=redirect.startsWith('/')&&!redirect.startsWith('//')?redirect:''; router.push(safeRedirect||(auth.isTipster ? '/tipster-dashboard' : '/dashboard'))
+    const redirect=String(route.query.redirect||'')
+    const safeRedirect=redirect.startsWith('/')&&!redirect.startsWith('//')?redirect:''
+    if (safeRedirect) {
+      router.push(safeRedirect)
+    } else if (auth.user?.role === 'tipster') {
+      router.push('/tipster-dashboard')
+    } else if (auth.user?.role === 'admin') {
+      router.push('/dashboard')
+    } else {
+      router.push('/dashboard')
+    }
   } catch (e: any) {
     error.value = e?.message || 'Unable to sign in. Please check your details.'
   } finally {

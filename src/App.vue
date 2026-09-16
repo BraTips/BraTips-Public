@@ -64,9 +64,11 @@
               </div>
             </div>
             <NotificationBell/>
+            <button class="theme-toggle" type="button" :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'" :title="isDark ? 'Light mode' : 'Dark mode'" @click="toggleTheme"><span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span></button>
             <button class="ghost nav-logout" @click="auth.logout">Log out</button>
           </template>
           <template v-else>
+            <button class="theme-toggle" type="button" :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'" :title="isDark ? 'Light mode' : 'Dark mode'" @click="toggleTheme"><span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span></button>
             <RouterLink to="/login" class="ghost nav-login">Log in</RouterLink>
             <RouterLink to="/signup" class="btn nav-signup">Sign up</RouterLink>
           </template>
@@ -121,6 +123,10 @@ import BrandedToast from './components/BrandedToast.vue';
 const auth=useAuth();
 const route=useRoute();
 const mobileOpen=ref(false);
+const isDark=ref(false);
+function applyTheme(dark:boolean){isDark.value=dark;document.documentElement.dataset.theme=dark?'dark':'light';localStorage.setItem('bratips-theme',dark?'dark':'light');}
+function toggleTheme(){applyTheme(!isDark.value);}
+onMounted(()=>{const saved=localStorage.getItem('bratips-theme'); applyTheme(saved ? saved==='dark' : window.matchMedia?.('(prefers-color-scheme: dark)').matches===true);});
 const accountOpen=ref(false);
 const closeMobile=()=>{mobileOpen.value=false};
 
