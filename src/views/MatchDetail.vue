@@ -52,7 +52,7 @@
                 </div>
               </div>
             </div>
-            <div v-else class="empty compact">Odds are not available for this match yet.</div>
+            <EmptyState v-else title="Odds not available" message="Market prices have not been returned for this match yet." icon="↘" compact />
           </div>
 
           <div class="mc-panel">
@@ -60,7 +60,7 @@
             <RouterLink v-for="p in predictions" :key="p._id" :to="p.locked ? '/subscription' : predictionPath(p._id)" :class="['tip-row','bratips-detail-prediction',{locked:p.locked}]">
               <div><b>{{ p.locked ? 'Premium prediction locked' : p.prediction }}</b><span>{{ p.locked ? 'Subscribe to reveal the selection and odds' : (p.systemGenerated ? 'BraTipsters model' : (p.tipsterId?.name || 'BraTipsters tipster')) }}</span></div><strong>{{ p.locked ? '🔒' : price(p.odds) }}</strong>
             </RouterLink>
-            <div v-if="!predictions.length" class="empty compact">BraTipsters is preparing the model for this fixture. Refresh in a moment.</div>
+            <EmptyState v-if="!predictions.length" title="Prediction being prepared" message="BraTipsters is preparing the model for this fixture. Refresh in a moment." icon="✦" compact />
           </div>
 
           <div class="mc-panel">
@@ -88,7 +88,7 @@
             <div class="stat-head"><span>{{ home.shortName || home.name }}</span><b>STAT</b><span>{{ away.shortName || away.name }}</span></div>
             <div v-for="s in statRows" :key="s.name" class="stat-line"><b>{{ s.home }}</b><span>{{ s.name }}</span><b>{{ s.away }}</b></div>
           </div>
-          <div v-else class="empty">Detailed statistics are not available for this fixture yet.</div>
+          <EmptyState v-else title="Statistics not available" message="Detailed statistics are not available for this fixture yet." icon="◎" compact />
         </section>
 
         <section v-else-if="activeTab === 'h2h'" class="mc-panel">
@@ -96,7 +96,7 @@
           <div v-if="research.h2h?.length" class="h2h-list">
             <div v-for="row in research.h2h" :key="row.id" class="h2h-row"><div><b>{{ row.name }}</b><span>{{ formatDate(row.starting_at) }}</span></div><strong>{{ row.result_info || 'Scheduled' }}</strong></div>
           </div>
-          <div v-else class="empty">No recent head-to-head data is available.</div>
+          <EmptyState v-else title="No head-to-head data" message="No recent head-to-head matches are available for this fixture." icon="↔" compact />
         </section>
 
         <section v-else-if="activeTab === 'events'" class="mc-panel">
@@ -104,12 +104,12 @@
           <div v-if="research.events?.length" class="event-list">
             <div v-for="(event, index) in research.events" :key="event.id || index" class="event-row"><span>{{ event.minute || event.time?.minute || '—' }}'</span><b>{{ event.type?.name || event.type?.developer_name || 'Event' }}</b><span>{{ event.player?.name || event.participant?.name || event.result || '' }}</span></div>
           </div>
-          <div v-else class="empty">No events have been recorded.</div>
+          <EmptyState v-else title="No events recorded" message="Match events will appear here when they are available." icon="•" compact />
         </section>
 
         <section v-else-if="activeTab === 'table'" class="mc-panel">
           <div class="mc-panel-head"><div><span class="eyebrow">League context</span><h2>Standings</h2></div></div>
-          <div v-if="research.standings?.length" class="standings-mini"><div v-for="row in research.standings" :key="row.participantId" class="standing-row"><span>#{{ row.position }}</span><b>{{ row.participant || standingName(row.participantId) }}</b><strong>{{ row.points }} pts</strong></div></div><div v-else class="empty">Standings are not available for this competition.</div>
+          <div v-if="research.standings?.length" class="standings-mini"><div v-for="row in research.standings" :key="row.participantId" class="standing-row"><span>#{{ row.position }}</span><b>{{ row.participant || standingName(row.participantId) }}</b><strong>{{ row.points }} pts</strong></div></div><EmptyState v-else title="Standings not available" message="Competition standings are not available for this fixture yet." icon="#" compact />
         </section>
       </div>
 
@@ -134,6 +134,8 @@ import { RouterLink, useRoute } from 'vue-router';
 import { api } from '../services/api';
 import TeamLogo from '../components/TeamLogo.vue';
 import FormList from '../components/FormList.vue';
+import EmptyState from '../components/EmptyState.vue';
+import { formatDate, formatOdds, formatTime } from '../utils/formatters';
 
 const route = useRoute();
 const match = ref<any>(null);
@@ -153,7 +155,7 @@ const scoreLabel = computed(() => match.value?.status === 'live' || match.value?
 const xg = computed(() => {
   const rows = Array.isArray(research.value.xg) ? research.value.xg : [];
   const out:any = {home:null,away:null};
-  rows.forEach((x:any) => { const value = x.data?.value ?? x.value; if (String(x.location).toLowerCase() === 'home') out.home = value != null ? Number(value).toFixed(2) : null; if (String(x.location).toLowerCase() === 'away') out.away = value != null ? Number(value).toFixed(2) : null; });
+  rows.forEach((x:any) => { const value = x.data?.value ?? x.value; if (String(x.location).toLowerCase() === 'home') out.home = value != null ? formatOdds(value) : null; if (String(x.location).toLowerCase() === 'away') out.away = value != null ? formatOdds(value) : null; });
   return out;
 });
 const xgWidth = computed(() => { const a=Number(xg.value.home||0), b=Number(xg.value.away||0), total=a+b; return total ? Math.max(8,Math.min(92,a/total*100)) : 50; });
@@ -165,9 +167,8 @@ const statRows = computed(() => {
   return Array.from(map.values()).slice(0,24);
 });
 function formatStat(v:any){if(v==null)return '—';if(typeof v==='object')return v.value ?? v.count ?? '—';return String(v);}
-function formatDate(v:any){return v?new Date(v).toLocaleDateString([],{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'—'}
-function time(v:any){return v?new Date(v).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'}
-function price(v:any){return Number(v)>0?Number(v).toFixed(2):'—'}
+function time(v:any){return formatTime(v)}
+function price(v:any){return formatOdds(v)}
 function movement(v:any){return v==null?'—':`${Number(v)>0?'+':''}${Number(v).toFixed(1)}%`}
 function movementClass(v:any){return v==null?'muted':Number(v)<0?'move-down':'move-up'}
 function oddKey(o:any){return `${o.bookmakerId||0}-${o.marketId||0}-${o.label}`}

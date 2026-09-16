@@ -84,6 +84,7 @@
 
     <main><RouterView/></main>
     <BrandedConfirmModal/>
+    <BrandedToast/>
 
     <footer v-if="!minimalChrome">
       <div class="wrap foot">
@@ -103,6 +104,7 @@ import {RouterLink,RouterView,useRoute} from 'vue-router';
 import {useAuth} from './stores/auth';
 import NotificationBell from './components/NotificationBell.vue';
 import BrandedConfirmModal from './components/BrandedConfirmModal.vue';
+import BrandedToast from './components/BrandedToast.vue';
 const auth=useAuth();
 const route=useRoute();
 const mobileOpen=ref(false);

@@ -198,7 +198,401 @@ footer{background:linear-gradient(145deg,#0d1729,#101a2e 60%,#1d172a)}
 .premium-lock{display:inline-flex!important;align-items:center;gap:4px;background:#fff5d6!important;color:#9a6b00!important;border:1px solid #f0d98d}.premium-badge{display:inline-flex!important;align-items:center;gap:4px;background:#fff5d6;color:#9a6b00!important;border:1px solid #f0d98d;padding:3px 6px;border-radius:6px}.acca-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.acca-card{padding:18px}.acca-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.acca-head h2{margin:3px 0 0}.acca-head>strong{font-size:20px;color:#087d50}.acca-leg{display:grid;grid-template-columns:1fr auto;gap:3px 8px;padding:11px 0;border-top:1px solid var(--line)}.acca-leg b{color:#24324e}.acca-leg small{grid-column:1/-1;color:#8a95a5}.acca-card .btn{display:inline-block;margin-top:12px}@media(max-width:850px){.acca-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.acca-grid{grid-template-columns:1fr}}
 
 /* BraTipsters reusable branded feedback UI */
+.bt-loader-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(10,17,30,.42);backdrop-filter:blur(4px)}
+.bt-loader-card{width:190px;padding:24px 20px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:linear-gradient(145deg,#101a2e,#182844);color:#fff;text-align:center;box-shadow:0 22px 70px rgba(0,0,0,.25)}
+.bt-loader-mark{width:48px;height:48px;margin:0 auto 12px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#ed275f,#a8194b);box-shadow:0 10px 28px rgba(237,39,95,.3);position:relative}.bt-loader-mark span{font-size:23px}.bt-loader-ring{width:23px;height:23px;margin:-36px auto 18px;border:2px solid rgba(255,255,255,.22);border-top-color:#fff;border-radius:50%;animation:btSpin .8s linear infinite}.bt-loader-card strong,.bt-loader-card small{display:block}.bt-loader-card strong{font-size:14px}.bt-loader-card small{margin-top:5px;color:#aeb9c9;font-size:9px}@keyframes btSpin{to{transform:rotate(360deg)}}
+.bt-loader-enter-active,.bt-loader-leave-active{transition:opacity .16s}.bt-loader-enter-from,.bt-loader-leave-to{opacity:0}
 .bt-modal-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(8,14,26,.58);backdrop-filter:blur(5px)}.bt-confirm-modal{width:min(430px,100%);position:relative;background:#fff;border:1px solid #e2e6ec;border-radius:20px;padding:28px;box-shadow:0 28px 90px rgba(8,14,26,.28);text-align:center}.bt-modal-x{position:absolute;right:14px;top:12px;width:30px;height:30px;border:0;border-radius:50%;background:#f3f5f8;color:#66758a;font-size:20px;cursor:pointer}.bt-confirm-icon{width:50px;height:50px;margin:0 auto 11px;border-radius:15px;display:grid;place-items:center;background:#fff0f4;color:#ed275f;font-size:22px;font-weight:900}.bt-confirm-icon.danger{background:#fff0f0;color:#d92d20}.bt-confirm-kicker{color:#ed275f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.bt-confirm-modal h2{margin:6px 0 8px;color:#182842;font-size:21px}.bt-confirm-modal p{margin:0 auto;color:#6f7b8e;font-size:11px;line-height:1.65;max-width:350px}.bt-confirm-actions{display:flex;justify-content:center;gap:9px;margin-top:21px}.bt-confirm-actions button{min-width:110px}.bt-confirm-actions .btn.danger{background:#d92d20}.bt-modal-enter-active,.bt-modal-leave-active{transition:opacity .16s}.bt-modal-enter-active .bt-confirm-modal,.bt-modal-leave-active .bt-confirm-modal{transition:transform .16s}.bt-modal-enter-from,.bt-modal-leave-to{opacity:0}.bt-modal-enter-from .bt-confirm-modal,.bt-modal-leave-to .bt-confirm-modal{transform:translateY(8px) scale(.98)}
 
 /* BraTipsters branded success state for reusable feedback modal */
 .bt-confirm-icon.success{color:#16845b;border-color:rgba(22,132,91,.22);background:rgba(22,132,91,.10)}
+
+/* Shared BraTipsters design system: one card shell, one empty state, one action feedback pattern. */
+:root{--bt-card-bg:#fff;--bt-card-border:#dfe5ed;--bt-card-radius:16px;--bt-card-shadow:0 7px 24px rgba(16,26,46,.045);--bt-muted:#748196;--bt-pink:#ed275f;--bt-navy:#182842}
+.bt-card{box-sizing:border-box;background:var(--bt-card-bg);border:1px solid var(--bt-card-border);border-radius:var(--bt-card-radius);box-shadow:var(--bt-card-shadow);padding:20px}.bt-card--soft{background:#fafbfd}.bt-card--compact{padding:15px}.bt-card--interactive{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.bt-card--interactive:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(16,26,46,.08);border-color:#d4dce7}.bt-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}.bt-card-heading h2{margin:4px 0 0;color:var(--bt-navy);font-size:20px;letter-spacing:-.35px}.bt-card-heading p{margin:5px 0 0;color:var(--bt-muted);font-size:11px;line-height:1.55}.bt-card-actions{flex:none}
+.bt-empty{min-height:180px;padding:30px 22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px dashed #d8e0e9;border-radius:15px;background:linear-gradient(180deg,#fbfcfe,#f7f9fc);color:#24324e}.bt-empty--compact{min-height:120px;padding:22px}.bt-empty-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:11px;background:#fff0f4;color:var(--bt-pink);font-weight:900;font-size:20px}.bt-empty h3{margin:0;font-size:15px;letter-spacing:-.15px}.bt-empty p{max-width:430px;margin:6px 0 0;color:var(--bt-muted);font-size:11px;line-height:1.6}.bt-empty-action{margin-top:14px}
+/* Existing special panels inherit the same visual system instead of each page inventing a card. */
+.pro-panel,.trend-panel,.recent-results-card,.history-filter-card{border-color:var(--bt-card-border);border-radius:var(--bt-card-radius);box-shadow:var(--bt-card-shadow)}
+.card.tip-card{border-color:var(--bt-card-border);border-radius:var(--bt-card-radius);box-shadow:var(--bt-card-shadow)}
+.bt-inline-loader{display:inline-flex;align-items:center;gap:8px;color:inherit;font-size:11px;font-weight:800}.bt-inline-loader i{width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:btSpin .7s linear infinite;opacity:.72}.bt-inline-loader span{white-space:nowrap}
+.bt-toast{position:fixed;right:22px;bottom:22px;z-index:11000;width:min(390px,calc(100vw - 32px));display:grid;grid-template-columns:36px 1fr 24px;gap:10px;align-items:start;padding:14px;border:1px solid #dfe5ed;border-radius:15px;background:#fff;box-shadow:0 18px 55px rgba(8,14,26,.16)}.bt-toast-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#eef3f8;color:#38516e;font-weight:900}.bt-toast--success .bt-toast-icon{background:#e7f8f0;color:#087d50}.bt-toast--error .bt-toast-icon{background:#fff0f3;color:#d12b4e}.bt-toast strong{display:block;color:#182842;font-size:12px}.bt-toast p{margin:3px 0 0;color:#6f7b8e;font-size:10px;line-height:1.5}.bt-toast>button{border:0;background:transparent;color:#8a95a5;font-size:19px;cursor:pointer}.bt-toast-enter-active,.bt-toast-leave-active{transition:opacity .18s,transform .18s}.bt-toast-enter-from,.bt-toast-leave-to{opacity:0;transform:translateY(8px)}
+@media(max-width:650px){.bt-toast{right:16px;bottom:16px}.bt-card{padding:16px}}
+/* Consistent card treatment across feature pages. Content can still use its own internal layout. */
+.card,.pro-panel,.trend-panel,.trend-kpi,.recent-results-card,.history-filter-card,.history-list-card,.tip-pro-card,.bot-pro-card,.premium-feature,.ranking-list,.drop-filter-panel,.drop-summary>div,.td-kpi,.td-checklist,.tip-overview,.signal-strip{border-color:var(--bt-card-border);border-radius:var(--bt-card-radius);box-shadow:var(--bt-card-shadow)}
+/* Mobile readability fix: raises font sizes below a comfortable reading minimum
+   on small screens only (max-width:768px). Desktop sizing is untouched.
+   Generated by auditing every font-size < 14px declaration in this file;
+   badge/icon-style elements (fixed small square/circle with a single
+   letter/number) get a smaller, size-appropriate bump so they don't overflow
+   their box; everything else (labels, meta text, table cells, nav, etc.)
+   is floored to 13px, a widely-used minimum for legible body/meta text. */
+@media(max-width:768px){
+.eyebrow{font-size:13px!important}
+.tag{font-size:13px!important}
+.confidence{font-size:13px!important}
+.meta{font-size:13px!important}
+.small{font-size:13px!important}
+.error{font-size:13px!important}
+.switch{font-size:13px!important}
+.foot a{font-size:13px!important}
+.copyright{font-size:13px!important}
+.notice p{font-size:13px!important}
+.match-league{font-size:13px!important}
+.team b{font-size:13px!important}
+.notif-count{font-size:13px!important}
+.notif-head .ghost{font-size:13px!important}
+.edge-teams{font-size:13px!important}
+.edge-teams span{font-size:13px!important}
+.edge-meta{font-size:13px!important}
+.result{font-size:13px!important}
+.vs{font-size:13px!important}
+.team-block b{font-size:13px!important}
+.row-league{font-size:13px!important}
+.status-chip{font-size:13px!important}
+.row-score small{font-size:13px!important}
+.row-cta{font-size:13px!important}
+.back-link{font-size:13px!important}
+.league-line{font-size:13px!important}
+.match-center .status-chip{font-size:13px!important}
+.odds-table th,.odds-table td{font-size:13px!important}
+.odds-table th{font-size:13px!important}
+.research-item{font-size:13px!important}
+.notice-strip{font-size:13px!important}
+.drop-price .old{font-size:13px!important}
+.prediction-kpis span{font-size:13px!important}
+.row-team b{font-size:13px!important}
+.mini-odds span{font-size:13px!important}
+.bot-odds{font-size:13px!important}
+.mc-league{font-size:13px!important}
+.live-pill{font-size:13px!important}
+.mc-team small{font-size:13px!important}
+.mc-score .mc-status{font-size:13px!important}
+.text-link{font-size:13px!important}
+.market-title span{font-size:13px!important}
+.market-line{font-size:13px!important}
+.tip-row span{font-size:13px!important}
+.xg-box span{font-size:13px!important}
+.form-list>b{font-size:13px!important}
+.form-items span{font-size:13px!important}
+.stat-head{font-size:13px!important}
+.stat-line{font-size:13px!important}
+.h2h-row span{font-size:13px!important}
+.quick-row{font-size:13px!important}
+.disclaimer{font-size:13px!important}
+.mc-score small{font-size:13px!important}
+.event-row{font-size:13px!important}
+.mc-tabs button{font-size:13px!important}
+.side-title{font-size:13px!important}
+.side-item,.side-mini{font-size:13px!important}
+.side-item b{font-size:13px!important}
+.side-mini{font-size:13px!important}
+.home-heading p{font-size:13px!important}
+.signal-bar>span{font-size:13px!important}
+.feature-time small{font-size:13px!important}
+.feature-teams>div b{font-size:13px!important}
+.feature-teams>span{font-size:13px!important}
+.feature-pick small{font-size:13px!important}
+.feature-pick b{font-size:13px!important}
+.feature-pick span{font-size:13px!important}
+.text-link,.right-heading>a{font-size:13px!important}
+.compact-time b{font-size:13px!important}
+.compact-time small{font-size:13px!important}
+.compact-teams span{font-size:13px!important}
+.compact-tip small{font-size:13px!important}
+.compact-tip b{font-size:13px!important}
+.compact-tip strong{font-size:13px!important}
+.compact-icons span:first-child{font-size:13px!important}
+.compact-icons .live-dot{font-size:13px!important}
+.tool-card small{font-size:13px!important}
+.tool-card p{font-size:13px!important}
+.tipster-avatar{font-size:13px!important}
+.tipster-info small{font-size:13px!important}
+.premium-callout b{font-size:13px!important}
+.premium-callout p{font-size:13px!important}
+.premium-callout a{font-size:13px!important}
+.popular{font-size:13px!important}
+.plan-label{font-size:13px!important}
+.plan-card li{font-size:13px!important}
+.billing-note{font-size:13px!important}
+.billing-status small{font-size:13px!important}
+.success-box{font-size:13px!important}
+.side-item{font-size:13px!important}
+.signal-bar{font-size:13px!important}
+.pro-page-head p{font-size:13px!important}
+.head-action{font-size:13px!important}
+.pro-stat-strip span{font-size:13px!important}
+.pro-section-head>span{font-size:13px!important}
+.pro-tipster-name span{font-size:13px!important}
+.pro-tipster-card>p{font-size:13px!important}
+.pro-kpis span{font-size:13px!important}
+.pro-kpis b{font-size:13px!important}
+.pro-profile-main p{font-size:13px!important}
+.profile-record span,.profile-record small{font-size:13px!important}
+.drop-kicker{font-size:13px!important}
+.drop-hero p{font-size:13px!important}
+.drop-live-card b{font-size:13px!important}
+.drop-live-card small{font-size:13px!important}
+.drop-summary span,.drop-summary small{font-size:13px!important}
+.drop-filter-title b{font-size:13px!important}
+.drop-filter-title small{font-size:13px!important}
+.drop-filter,.drop-select,.drop-clear{font-size:13px!important}
+.drop-info b{font-size:13px!important}
+.drop-info small{font-size:13px!important}
+.drop-table-head{font-size:13px!important}
+.drop-league{font-size:13px!important}
+.drop-teams{font-size:13px!important}
+.drop-vs{font-size:13px!important}
+.drop-time{font-size:13px!important}
+.drop-cell .drop-old{font-size:13px!important}
+.drop-cell small{font-size:13px!important}
+.drop-footer-note b{font-size:13px!important}
+.drop-footer-note p{font-size:13px!important}
+.tipsters-head-pro p{font-size:13px!important}
+.tip-over-title b{font-size:13px!important}
+.tip-over-title small{font-size:13px!important}
+.profit-label{font-size:13px!important}
+.overview-grid span{font-size:13px!important}
+.chart-top b{font-size:13px!important}
+.chart-top span{font-size:13px!important}
+.chart-empty{font-size:13px!important}
+.chart-labels{font-size:13px!important}
+.tip-search input{font-size:13px!important}
+.tip-sort{font-size:13px!important}
+.tip-section-title>span{font-size:13px!important}
+.rank-ribbon{font-size:13px!important}
+.tip-card-name>small{font-size:13px!important}
+.rank-number{font-size:13px!important}
+.tip-live{font-size:13px!important}
+.tip-live b{font-size:13px!important}
+.tip-main-kpi span{font-size:13px!important}
+.tip-stats-grid span{font-size:13px!important}
+.tip-stats-grid b{font-size:13px!important}
+.tip-card-bottom{font-size:13px!important}
+.football-hero p{font-size:13px!important}
+.hero-action,.head-action{font-size:13px!important}
+.live-strip-title b{font-size:13px!important}
+.live-strip-title small,.signal-strip small{font-size:13px!important}
+.live-strip-stat span{font-size:13px!important}
+.signal-strip>a{font-size:13px!important}
+.page-tab{font-size:13px!important}
+.page-tab-special{font-size:13px!important}
+.match-intel-top{font-size:13px!important}
+.status-badge,.result-badge{font-size:13px!important}
+.intel-team b{font-size:13px!important}
+.intel-team small{font-size:13px!important}
+.intel-centre small{font-size:13px!important}
+.match-intel-bottom{font-size:13px!important}
+.search-field input{font-size:13px!important}
+.segmented button{font-size:13px!important}
+.premium-research p{font-size:13px!important}
+.history-kpis span,.dash-kpis span{font-size:13px!important}
+.history-kpis small,.dash-kpis small{font-size:13px!important}
+.pro-section-head>a,.pro-section-head>span{font-size:13px!important}
+.history-table th,.history-table td{font-size:13px!important}
+.history-table th{font-size:13px!important}
+.history-note{font-size:13px!important}
+.bot-badge{font-size:13px!important}
+.live-label{font-size:13px!important}
+.bot-fixture b{font-size:13px!important}
+.bot-fixture>span{font-size:13px!important}
+.bot-selection small,.bot-selection span{font-size:13px!important}
+.bot-card-stats span{font-size:13px!important}
+.bot-card-stats b{font-size:13px!important}
+.bot-pro-card>p{font-size:13px!important}
+.bot-open{font-size:13px!important}
+.recent-result-row div b{font-size:13px!important}
+.recent-result-row div small{font-size:13px!important}
+.recent-result-row>strong{font-size:13px!important}
+.bot-disclaimer{font-size:13px!important}
+.prediction-hero p{font-size:13px!important}
+.back-soft{font-size:13px!important}
+.result-badge.large{font-size:13px!important}
+.prediction-teams b{font-size:13px!important}
+.prediction-teams>span{font-size:13px!important}
+.prediction-kpi-row span{font-size:13px!important}
+.prediction-kpi-row strong{font-size:13px!important}
+.analysis-copy{font-size:13px!important}
+.subscription-banner p{font-size:13px!important}
+.subscription-trust b{font-size:13px!important}
+.subscription-trust span{font-size:13px!important}
+.subscription-trust small{font-size:13px!important}
+.success-box,.notice-strip{font-size:13px!important}
+.membership-bar span{font-size:13px!important}
+.membership-bar b{font-size:13px!important}
+.plan-popular{font-size:13px!important}
+.plan-tier{font-size:13px!important}
+.plan-pro p{font-size:13px!important}
+.price-line span{font-size:13px!important}
+.plan-pro li{font-size:13px!important}
+.subscription-features b{font-size:13px!important}
+.subscription-features span{font-size:13px!important}
+.dashboard-welcome p{font-size:13px!important}
+.my-pick-fixture b{font-size:13px!important}
+.my-pick-fixture span{font-size:13px!important}
+.my-pick-row small{font-size:13px!important}
+.my-pick-row>div>b{font-size:13px!important}
+.record-grid span{font-size:13px!important}
+.activity-item b{font-size:13px!important}
+.activity-item p{font-size:13px!important}
+.activity-item small{font-size:13px!important}
+.quick-links a>span{font-size:13px!important}
+.quick-links b{font-size:13px!important}
+.quick-links small{font-size:13px!important}
+.history-title p{font-size:13px!important}
+.history-filter-grid label span{font-size:13px!important}
+.history-count{font-size:13px!important}
+.history-list-head{font-size:13px!important}
+.history-date{font-size:13px!important}
+.history-teams{font-size:13px!important}
+.history-teams b{font-size:13px!important}
+.history-fixture-pro small{font-size:13px!important}
+.history-selection strong{font-size:13px!important}
+.history-selection small{font-size:13px!important}
+.premium-tip{font-size:13px!important}
+.history-tipster{font-size:13px!important}
+.history-outcome{font-size:13px!important}
+.history-odds{font-size:13px!important}
+.history-summary span{font-size:13px!important}
+.history-fixture-text{font-size:13px!important}
+.auth-kicker,.auth-section-label{font-size:13px!important}
+.auth-showcase-copy p{font-size:13px!important}
+.auth-signal-grid span{font-size:13px!important}
+.auth-ticker{font-size:13px!important}
+.auth-ticker b{font-size:13px!important}
+.auth-heading p{font-size:13px!important}
+.auth-field label{font-size:13px!important}
+.auth-hint{font-size:13px!important}
+.auth-input-wrap span{font-size:13px!important}
+.auth-input-wrap input{font-size:13px!important}
+.auth-alert{font-size:13px!important}
+.auth-submit{font-size:13px!important}
+.auth-divider{font-size:13px!important}
+.auth-secondary{font-size:13px!important}
+.auth-tipster-cta{font-size:13px!important}
+.auth-footnote{font-size:13px!important}
+.auth-feature-list i{font-size:13px!important}
+.auth-feature-list span{font-size:13px!important}
+.tipster-apply-hero p{font-size:13px!important}
+.tipster-hero-status b{font-size:13px!important}
+.tipster-hero-status small{font-size:13px!important}
+.tipster-benefit i{font-size:13px!important}
+.tipster-benefit b{font-size:13px!important}
+.tipster-benefit span{font-size:13px!important}
+.tipster-side-note b{font-size:13px!important}
+.tipster-side-note span{font-size:13px!important}
+.tipster-form-head p{font-size:13px!important}
+.tipster-form-badge{font-size:13px!important}
+.tipster-form-section-title b{font-size:13px!important}
+.tipster-apply-card .auth-field textarea{font-size:13px!important}
+.plain-input{font-size:13px!important}
+.tipster-section-help{font-size:13px!important}
+.tipster-form-foot{font-size:13px!important}
+.table th{font-size:13px!important}
+.td-hero p{font-size:13px!important}
+.td-status{font-size:13px!important}
+.td-kpi span,.td-kpi small{font-size:13px!important}
+.td-kpi small{font-size:13px!important}
+.td-kpi strong{font-size:13px!important}
+.td-head-copy{font-size:13px!important}
+.td-review-badge{font-size:13px!important}
+.td-section-label b{font-size:13px!important}
+.td-section-label small{font-size:13px!important}
+.td-submit .field label{font-size:13px!important}
+.td-submit .field input,.td-submit .field select,.td-submit .field textarea{font-size:13px!important}
+.td-counter{font-size:13px!important}
+.td-submit-foot b{font-size:13px!important}
+.td-submit-foot span{font-size:13px!important}
+.td-table-head{font-size:13px!important}
+.td-table-row{font-size:13px!important}
+.td-table-row small{font-size:13px!important}
+.td-table-row>strong{font-size:13px!important}
+.td-status-pill{font-size:13px!important}
+.td-record-score>div:first-child span{font-size:13px!important}
+.td-ring small{font-size:13px!important}
+.td-progress>div:first-child{font-size:13px!important}
+.td-mini-stats span{font-size:13px!important}
+.td-mini-stats b{font-size:13px!important}
+.td-profile-card p{font-size:13px!important}
+.td-profile-meta span{font-size:13px!important}
+.td-checklist>div{font-size:13px!important}
+.recent-result-teams b{font-size:13px!important}
+.recent-result-teams>span,.recent-score{font-size:13px!important}
+.recent-result-teams small{font-size:13px!important}
+.recent-odds{font-size:13px!important}
+.td-wallet-badge{font-size:13px!important}
+.td-wallet-grid span{font-size:13px!important}
+.td-wallet-actions span{font-size:13px!important}
+.info-nav b{font-size:13px!important}
+.info-nav a{font-size:13px!important}
+.ranking-toolbar label{font-size:13px!important}
+.ranking-main small,.ranking-metric span{font-size:13px!important}
+.ranking-note{font-size:13px!important}
+.feature-icon{font-size:13px!important}
+.premium-feature p{font-size:13px!important}
+.responsible p{font-size:13px!important}
+.footer-disclaimer{font-size:13px!important}
+.info-note span{font-size:13px!important}
+.info-note p{font-size:13px!important}
+.recent-form-row>span{font-size:13px!important}
+.nav-menu-trigger span{font-size:13px!important}
+.nav-dropdown a{font-size:13px!important}
+.desktop-nav>a,.nav-menu>summary{font-size:13px!important}
+.mobile-nav-inner>a{font-size:13px!important}
+.nav-login{font-size:13px!important}
+.nav-signup{font-size:13px!important}
+.home-explore-head p{font-size:13px!important}
+.home-explore-tag{font-size:13px!important}
+.home-explore-card p{font-size:13px!important}
+.home-explore-card b{font-size:13px!important}
+.football-match-card .status-badge{font-size:13px!important}
+.football-match-card .pmc-locked strong,.football-match-card .pmc-preparing strong{font-size:13px!important}
+.football-match-card .pmc-locked small,.football-match-card .pmc-preparing small{font-size:13px!important}
+.football-centre-kicker{font-size:13px!important}
+.football-centre-hero p{font-size:13px!important}
+.football-centre-hero-stats span{font-size:13px!important}
+.football-day-tab{font-size:13px!important}
+.day-icon{font-size:13px!important}
+.football-selects select{font-size:13px!important}
+.football-price-link{font-size:13px!important}
+.football-live-copy strong{font-size:13px!important}
+.football-live-copy small{font-size:13px!important}
+.live-strip-item b{font-size:13px!important}
+.live-strip-item span{font-size:13px!important}
+.football-live-strip>a{font-size:13px!important}
+.football-section-kicker{font-size:13px!important}
+.football-section-head>span{font-size:13px!important}
+.football-match-card .pmc-league{font-size:13px!important}
+.football-match-card .pmc-time{font-size:13px!important}
+.football-match-card .pmc-teams b{font-size:13px!important}
+.football-match-card .pmc-teams small{font-size:13px!important}
+.football-match-card .pmc-score span{font-size:13px!important}
+.football-match-card .pmc-prediction-head{font-size:13px!important}
+.football-match-card .pmc-prediction-head b{font-size:13px!important}
+.football-match-card .pmc-pick span{font-size:13px!important}
+.football-match-card .pmc-metrics small{font-size:13px!important}
+.football-match-card .pmc-metrics b{font-size:13px!important}
+.football-match-card .pmc-footer{font-size:13px!important}
+.football-match-card .pmc-footer b{font-size:13px!important}
+.football-match-card .pmc-footer b span{font-size:13px!important}
+.panel-subcopy{font-size:13px!important}
+.weekly-date b{font-size:13px!important}
+.weekly-date small{font-size:13px!important}
+.weekly-fixture b{font-size:13px!important}
+.weekly-fixture>span{font-size:13px!important}
+.weekly-fixture>small{font-size:13px!important}
+.weekly-pick span{font-size:13px!important}
+.weekly-pick b{font-size:13px!important}
+.weekly-pick strong{font-size:13px!important}
+.weekly-more{font-size:13px!important}
+.bt-confirm-kicker{font-size:13px!important}
+.bt-confirm-modal p{font-size:13px!important}
+.bt-card-heading p{font-size:13px!important}
+.bt-empty p{font-size:13px!important}
+.bt-inline-loader{font-size:13px!important}
+.bt-toast strong{font-size:13px!important}
+.bt-toast p{font-size:13px!important}
+.streak span{font-size:10px!important}
+.mini-form span{font-size:9px!important}
+.tipster-form-section-title span{font-size:10px!important}
+.td-section-label>span{font-size:10px!important}
+}

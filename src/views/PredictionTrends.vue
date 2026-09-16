@@ -15,18 +15,18 @@
       <div v-if="error" class="trends-error">{{ error }}</div>
       <template v-else>
         <section class="trend-kpis">
-          <article class="trend-kpi pink"><span class="kpi-icon">◎</span><div><small>Total Tips</small><strong>{{ fmt(summary.tips) }}</strong><em>Tracked in selected period</em></div></article>
-          <article class="trend-kpi green"><span class="kpi-icon">♜</span><div><small>Total Wins</small><strong>{{ fmt(summary.wins) }}</strong><em>{{ summary.tips ? pct(summary.wins/summary.tips*100) : '0.0' }}% of settled tips</em></div></article>
-          <article class="trend-kpi purple"><span class="kpi-icon">%</span><div><small>Win Rate</small><strong>{{ pct(summary.winRate) }}%</strong><em>Settled prediction rate</em></div></article>
-          <article class="trend-kpi pink"><span class="kpi-icon">↗</span><div><small>Total Profit</small><strong :class="summary.profit>=0?'positive':'negative'">{{ money(summary.profit) }}</strong><em>1-unit tracked performance</em></div></article>
-          <article class="trend-kpi blue"><span class="kpi-icon">◉</span><div><small>Avg. Odds</small><strong>{{ summary.avgOdds ? summary.avgOdds.toFixed(2) : '—' }}</strong><em>Across settled tips</em></div></article>
+          <BaseCard as="article" class="trend-kpi pink"><span class="kpi-icon">◎</span><div><small>Total Tips</small><strong>{{ fmt(summary.tips) }}</strong><em>Tracked in selected period</em></div></BaseCard>
+          <BaseCard as="article" class="trend-kpi green"><span class="kpi-icon">♜</span><div><small>Total Wins</small><strong>{{ fmt(summary.wins) }}</strong><em>{{ summary.tips ? pct(summary.wins/summary.tips*100) : '0.0' }}% of settled tips</em></div></BaseCard>
+          <BaseCard as="article" class="trend-kpi purple"><span class="kpi-icon">%</span><div><small>Win Rate</small><strong>{{ pct(summary.winRate) }}%</strong><em>Settled prediction rate</em></div></BaseCard>
+          <BaseCard as="article" class="trend-kpi pink"><span class="kpi-icon">↗</span><div><small>Total Profit</small><strong :class="summary.profit>=0?'positive':'negative'">{{ formatMoney(summary.profit,true) }}</strong><em>1-unit tracked performance</em></div></BaseCard>
+          <BaseCard as="article" class="trend-kpi blue"><span class="kpi-icon">◉</span><div><small>Avg. Odds</small><strong>{{ summary.avgOdds ? summary.avgOdds.toFixed(2) : '—' }}</strong><em>Across settled tips</em></div></BaseCard>
         </section>
 
         <section class="trend-main-grid">
           <article class="trend-panel chart-panel">
             <div class="trend-panel-head"><div><h2>Profit & Win Rate Trend</h2><p>Daily settled performance</p></div><div class="legend"><span><i class="dot profit-dot"></i> Profit/Loss</span><span><i class="dot rate-dot"></i> Win Rate</span></div></div>
             <div class="chart-wrap" v-if="daily.length">
-              <div class="y-axis"><span>{{ money(chartMax) }}</span><span>{{ money(chartMax/2) }}</span><span>USD 0</span><span>{{ money(chartMin/2) }}</span><span>{{ money(chartMin) }}</span></div>
+              <div class="y-axis"><span>{{ formatMoney(chartMax,true) }}</span><span>{{ formatMoney(chartMax/2,true) }}</span><span>{{ formatMoney(0,true) }}</span><span>{{ formatMoney(chartMin/2,true) }}</span><span>{{ formatMoney(chartMin,true) }}</span></div>
               <svg viewBox="0 0 760 280" preserveAspectRatio="none" class="trend-chart">
                 <line v-for="y in [30,85,140,195,250]" :key="y" x1="0" :y1="y" x2="760" :y2="y" class="grid-line"/>
                 <line x1="0" y1="140" x2="760" y2="140" class="zero-line"/>
@@ -38,7 +38,7 @@
               </svg>
               <div class="x-axis"><span v-for="d in chartLabels" :key="d.date">{{ shortDate(d.date) }}</span></div>
             </div>
-            <div v-else class="trend-empty">No settled prediction data in this period.</div>
+            <EmptyState v-else title="No settled data yet" message="There are no settled prediction results in the selected period. Trends will appear automatically as tips are settled." icon="↗" />
           </article>
 
           <article class="trend-panel market-distribution">
@@ -57,11 +57,11 @@
             <div v-for="(m,i) in markets.slice(0,8)" :key="m.market" class="market-row">
               <div class="market-name"><i :style="{background:palette[i%palette.length]}">{{i+1}}</i><strong>{{m.market}}</strong></div>
               <b>{{fmt(m.tips)}}</b><b>{{fmt(m.wins)}}</b><strong>{{pct(m.winRate)}}%</strong>
-              <strong :class="m.profit>=0?'positive':'negative'">{{money(m.profit)}}</strong><span>{{m.avgOdds.toFixed(2)}}</span>
+              <strong :class="m.profit>=0?'positive':'negative'">{{formatMoney(m.profit,true)}}</strong><span>{{m.avgOdds.toFixed(2)}}</span>
               <div class="spark"><span v-for="n in spark(m,i)" :key="n" :style="{height:n+'%'}"></span></div><span class="row-arrow">→</span>
             </div>
           </div>
-          <div v-else class="trend-empty">Prediction trends will appear after settled tips are recorded.</div>
+          <EmptyState v-else title="Trends are waiting for results" message="Prediction trends will appear after settled tips are recorded." icon="◎" compact />
         </section>
 
 
@@ -72,13 +72,14 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import {api} from '../services/api';
-import {formatMoney} from '../utils/format';
+import {formatMoney,formatNumber,formatShortDate} from '../utils/formatters';
+import EmptyState from '../components/EmptyState.vue';
+import BaseCard from '../components/BaseCard.vue';
 const days=ref(365),loading=ref(true),error=ref('');
 const summary=ref<any>({tips:0,wins:0,winRate:0,profit:0,avgOdds:0});
 const markets=ref<any[]>([]),distribution=ref<any[]>([]),daily=ref<any[]>([]);
 const palette=['#ed275f','#7757e8','#2397ee','#18c99a','#ffbd62','#9da8bb'];
-function fmt(n:number){return Number(n||0).toLocaleString();} function pct(n:number){return Number(n||0).toFixed(1)} function money(n:number){return formatMoney(n,true)}
-function shortDate(v:string){const d=new Date(v+'T00:00:00Z');return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
+function fmt(n:number){return formatNumber(n)} function pct(n:number){return Number(n||0).toFixed(1)} function shortDate(v:string){return formatShortDate(v)}
 async function load(){loading.value=true;error.value='';try{const r=await api.get(`/prediction-trends?days=${days.value}`);const d=r.data||{};summary.value=d.summary||summary.value;markets.value=d.markets||[];distribution.value=d.distribution||[];daily.value=d.daily||[];}catch(e:any){error.value=e?.message||'Unable to load prediction trends.'}finally{loading.value=false}}
 const chartMax=computed(()=>Math.max(100,...daily.value.map(d=>Math.abs(Number(d.profit||0)))));const chartMin=computed(()=>-chartMax.value);
 const barWidth=12; function pointX(i:number){return daily.value.length<2?380:(i/(daily.value.length-1))*740+10} function rateY(v:number){return 250-(Math.min(100,Math.max(0,v))/100)*220} function barX(i:number){return pointX(i)-barWidth/2} function barY(v:number){const zero=140, scale=110/chartMax.value;return v>=0?zero-v*scale:zero} function barHeight(v:number){return Math.max(2,Math.abs(v)*110/chartMax.value)}
