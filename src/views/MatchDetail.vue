@@ -55,6 +55,30 @@
             <EmptyState v-else title="Odds not available" message="Market prices have not been returned for this match yet." icon="↘" compact />
           </div>
 
+          <div v-if="selectedPrediction" class="mc-panel selected-tipster-pick">
+            <div class="mc-panel-head">
+              <div><span class="eyebrow">Tipster pick</span><h2>{{ selectedPrediction.tipsterId?.name || 'Tipster selection' }}</h2></div>
+              <span class="selected-pick-badge">SELECTED PICK</span>
+            </div>
+            <div class="selected-pick-main">
+              <div>
+                <span class="muted small">{{ selectedPrediction.isPremium ? 'Premium selection' : 'Published selection' }}</span>
+                <h3>{{ selectedPrediction.locked ? 'Premium prediction locked' : selectedPrediction.prediction }}</h3>
+                <p v-if="selectedPrediction.league || selectedPrediction.matchId?.leagueId?.name" class="muted">{{ selectedPrediction.league || selectedPrediction.matchId?.leagueId?.name }}</p>
+              </div>
+              <div class="selected-pick-odds"><span>Tipster odds</span><strong>{{ selectedPrediction.locked ? '🔒' : price(selectedPrediction.odds) }}</strong></div>
+            </div>
+            <div v-if="selectedPrediction.locked" class="selected-pick-locked">Subscribe to Premium to reveal this tipster's selection and quoted odds.</div>
+            <div v-else class="selected-pick-reasoning">
+              <div><span class="eyebrow">Why this pick?</span><p>{{ selectedPrediction.analysis || 'The tipster did not publish additional reasoning for this selection.' }}</p></div>
+              <div class="selected-pick-meta">
+                <div><span>Confidence</span><b>{{ selectedPrediction.confidence || '—' }}{{ selectedPrediction.confidence ? '%' : '' }}</b></div>
+                <div><span>Quoted odds</span><b>{{ price(selectedPrediction.odds) }}</b></div>
+                <RouterLink :to="`/predictions/${selectedPrediction._id}`" class="ghost">Full prediction details →</RouterLink>
+              </div>
+            </div>
+          </div>
+
           <div class="mc-panel">
             <div class="mc-panel-head"><div><span class="eyebrow">BraTipsters insight</span><h2>Predictions</h2></div></div>
             <RouterLink v-for="p in predictions" :key="p._id" :to="p.locked ? '/subscription' : predictionPath(p._id)" :class="['tip-row','bratips-detail-prediction',{locked:p.locked}]">
@@ -129,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { api } from '../services/api';
 import TeamLogo from '../components/TeamLogo.vue';
@@ -141,6 +165,7 @@ const route = useRoute();
 const match = ref<any>(null);
 const odds = ref<any[]>([]);
 const predictions = ref<any[]>([]);
+const selectedPrediction = ref<any>(null);
 const research = ref<any>({});
 const loading = ref(true);
 const activeTab = ref('overview');
@@ -178,10 +203,16 @@ async function load(){
   loading.value=true;
   try{
     const id=String(route.params.id);
-    const [m,o,p,r]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds`),api.get(`/matches/${id}/prediction`),api.get(`/matches/${id}/research`)]);
-    match.value=m.data; odds.value=o.data||[]; predictions.value=p.data||[]; research.value=r.data||{};
+    const selectedId=String(route.query.prediction || '');
+    const requests:any[]=[api.get(`/matches/${id}`),api.get(`/matches/${id}/odds`),api.get(`/matches/${id}/prediction`),api.get(`/matches/${id}/research`)];
+    if(selectedId) requests.push(api.get(`/predictions/${selectedId}`).catch(()=>({data:null})));
+    selectedPrediction.value=null;
+    const results=await Promise.all(requests);
+    match.value=results[0].data; odds.value=results[1].data||[]; predictions.value=results[2].data||[]; research.value=results[3].data||{};
+    selectedPrediction.value=results[4]?.data || predictions.value.find((p:any)=>String(p._id)===selectedId) || null;
   } catch(e){ match.value=null; } finally { loading.value=false; }
 }
+watch(() => route.fullPath, () => { load(); });
 onMounted(async () => { await load(); refreshTimer = window.setInterval(async () => { if (match.value?.status === 'live') { try { const id=String(route.params.id); const [m,o]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds?mode=inplay`)]); match.value=m.data; if ((o.data||[]).length) odds.value=o.data; } catch {} } }, 30000); });
 onUnmounted(() => { if (refreshTimer) window.clearInterval(refreshTimer); });
 </script>

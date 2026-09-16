@@ -7,6 +7,7 @@
         </RouterLink>
 
         <nav class="desktop-nav" aria-label="Primary navigation" ref="desktopNavEl">
+          <RouterLink to="/">Home</RouterLink>
           <RouterLink to="/matches">Matches</RouterLink>
 
           <div class="nav-menu" :class="{open: openMenu==='tips'}">
@@ -80,6 +81,7 @@
 
       <div v-if="mobileOpen" class="mobile-nav-panel">
         <div class="wrap mobile-nav-inner">
+          <RouterLink to="/" @click="closeMobile">Home</RouterLink>
           <RouterLink to="/matches" @click="closeMobile">Matches</RouterLink>
           <RouterLink to="/picks" @click="closeMobile">Latest Tips</RouterLink>
           <RouterLink to="/predictions" @click="closeMobile">All Predictions</RouterLink>
