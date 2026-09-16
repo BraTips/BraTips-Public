@@ -30,20 +30,19 @@
         <div class="grid2">
           <PickCard v-for="p in picks" :key="p._id" :pick="p" @play="play" />
         </div>
-        <EmptyState v-if="!picks.length" title="No published picks yet" message="This tipster has not published any visible selections yet." icon="✦" />
+        <div v-if="!picks.length" class="pro-panel empty">No published picks yet.</div>
       </template>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import {useConfirm} from '../composables/feedback';
+const {ask}=useConfirm();
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import {useConfirm,useToast} from '../composables/feedback';
-import EmptyState from '../components/EmptyState.vue';
 import { api } from '../services/api';
 import { useAuth } from '../stores/auth';
 import PickCard from '../components/PickCard.vue';
-const {ask}=useConfirm();const {show:toast}=useToast();
 
 const route=useRoute(), router=useRouter(), auth=useAuth();
 const profile=ref<any>(null), picks=ref<any[]>([]), following=ref(false), loading=ref(true), error=ref('');
@@ -56,7 +55,7 @@ function play(){ if(auth.isLoggedIn) router.push('/dashboard'); else router.push
 async function loadFollow(){
   following.value=false;
   if(!auth.isLoggedIn || !profile.value?.userId) return;
-  try { const d=await api.get('/me/follows'); following.value=(d.data||[]).some((x:any)=>String(x.tipsterId?._id||x.tipsterId)===String(profile.value.userId)); } catch { toast('Your follow status could not be refreshed.','error','Tipster') }
+  try { const d=await api.get('/me/follows'); following.value=(d.data||[]).some((x:any)=>String(x.tipsterId?._id||x.tipsterId)===String(profile.value.userId)); } catch {}
 }
 async function load(){
   loading.value=true; error.value=''; profile.value=null; picks.value=[];

@@ -4,11 +4,11 @@
     <section class="signal-strip"><div><span class="pulse-dot"></span><b>{{ title }}</b><small>Published selections for this market.</small></div><div><b>{{ picks.length }}</b><small>visible picks</small></div><RouterLink to="/subscription">Premium access →</RouterLink></section>
     <div v-if="loading" class="grid3"><div v-for="n in 6" :key="n" class="tip-skeleton"></div></div>
     <div v-else-if="error" class="pro-panel error">{{ error }} <button class="ghost" @click="load">Try again</button></div>
-    <div v-else class="grid3"><PickCard v-for="p in picks" :key="p._id" :pick="p" @play="play"/><EmptyState v-if="!picks.length" title="No selections yet" :message="`No published ${title.toLowerCase()} selections are available yet. Check back when new fixtures are published.`" icon="✦" /></div>
+    <div v-else class="grid3"><PickCard v-for="p in picks" :key="p._id" :pick="p" @play="play"/><div v-if="!picks.length" class="pro-panel empty">No published {{ title.toLowerCase() }} selections are available yet.</div></div>
   </div></div>
 </template>
 <script setup lang="ts">
-import {computed,onMounted,ref} from 'vue';import {RouterLink,useRouter} from 'vue-router';import {api} from '../services/api';import PickCard from '../components/PickCard.vue';import EmptyState from '../components/EmptyState.vue';
+import {computed,onMounted,ref} from 'vue';import {RouterLink,useRouter} from 'vue-router';import {api} from '../services/api';import PickCard from '../components/PickCard.vue';
 const props=defineProps<{market:string}>();const router=useRouter(),data=ref<any[]>([]),loading=ref(true),error=ref('');
 const meta:any={
   'over-2-5':{title:'Over 2.5 Tips',description:'Predictions focused on matches expected to finish with three or more total goals.'},

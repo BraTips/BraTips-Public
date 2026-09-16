@@ -46,7 +46,7 @@
           <OddsCell :row="group.markets.BTTS" />
         </RouterLink>
       </section>
-      <EmptyState v-else title="No price drops yet" message="No football price drops match the selected threshold. The board fills as the odds scheduler records multiple prices." icon="↘" />
+      <div v-else class="pro-panel empty">No football price drops match the selected threshold yet. The board fills as the odds scheduler records multiple prices.</div>
 
       <section class="drop-footer-note"><div class="drop-foot-icon">↘</div><div><b>Want deeper movement history?</b><p>Open any match to compare its recorded prices, bookmakers, predictions and research in the Football Match Centre.</p></div><RouterLink to="/matches" class="btn">Open Football Centre →</RouterLink></section>
     </div>
@@ -58,17 +58,15 @@ import { computed, defineComponent, h, onMounted, onUnmounted, ref, watch } from
 import { RouterLink } from 'vue-router';
 import { api } from '../services/api';
 import TeamLogo from '../components/TeamLogo.vue';
-import EmptyState from '../components/EmptyState.vue';
-import { formatDateTime, formatOdds } from '../utils/formatters';
 
 const filters=[{v:0,l:'Any drop'},{v:5,l:'5%+'},{v:10,l:'10%+'},{v:15,l:'15%+'}];
 const minDrop=ref(0), marketFilter=ref('all'), rows=ref<any[]>([]), loading=ref(true), error=ref(''), countdown=ref(30);
 const marketKey=(label:string, marketName:string)=>{const s=`${marketName||''} ${label||''}`.toLowerCase();if(s.includes('btts')||s.includes('both teams'))return 'BTTS';if(s.includes('over')&&s.includes('2.5'))return 'O 2.5';if(s.includes('under')&&s.includes('2.5'))return 'U 2.5';if(label==='1'||label.toLowerCase()==='home')return '1';if(label==='x'||label.toLowerCase()==='draw')return 'X';if(label==='2'||label.toLowerCase()==='away')return '2';return null};
-const OddsCell=defineComponent({props:{row:{type:Object,default:null}},setup(p){return()=>{const r:any=p.row;if(!r)return h('div',{class:'drop-cell empty-cell'},'—');const pct=Number(r.movementPct||0);return h('div',{class:['drop-cell',pct<0?'is-drop':'',Math.abs(pct)>=15?'strong-drop':'']},[h('span',{class:'drop-old'},formatOdds(r.previousValue)),h('strong',formatOdds(r.value)),h('small',null,`${pct>0?'+':''}${pct.toFixed(1)}%`)]);}}});
+const OddsCell=defineComponent({props:{row:{type:Object,default:null}},setup(p){return()=>{const r:any=p.row;if(!r)return h('div',{class:'drop-cell empty-cell'},'—');const pct=Number(r.movementPct||0);return h('div',{class:['drop-cell',pct<0?'is-drop':'',Math.abs(pct)>=15?'strong-drop':'']},[h('span',{class:'drop-old'},Number(r.previousValue||0).toFixed(2)),h('strong',Number(r.value||0).toFixed(2)),h('small',null,`${pct>0?'+':''}${pct.toFixed(1)}%`)]);}}});
 const grouped=computed(()=>{const map=new Map<string,any>();for(const r of rows.value){const m=r.matchId;if(!m)continue;const id=String(m._id);if(!map.has(id))map.set(id,{id,league:m.leagueId?.name||'Football',home:m.homeTeamId?.name||'Home',away:m.awayTeamId?.name||'Away',homeLogo:m.homeTeamId?.logo,awayLogo:m.awayTeamId?.logo,kickoff:m.kickoff,markets:{}});const key=marketKey(r.label,r.marketName);if(key&&(!marketFilter.value||marketFilter.value==='all'||(marketFilter.value==='1X2'?['1','X','2'].includes(key):marketFilter.value===key))){map.get(id).markets[key]=r;}}return [...map.values()].filter(x=>Object.keys(x.markets).length).sort((a,b)=>Math.max(...Object.values(b.markets).map((x:any)=>Math.abs(Number(x.movementPct||0))))-Math.max(...Object.values(a.markets).map((x:any)=>Math.abs(Number(x.movementPct||0)))));});
 const strongestDrop=computed(()=>{const values=rows.value.map(x=>Number(x.movementPct||0)).filter(x=>x<0);return values.length?Math.abs(Math.min(...values)).toFixed(1):'0.0'});
 const marketCount=computed(()=>new Set(rows.value.map(x=>marketKey(x.label,x.marketName)).filter(Boolean)).size);
-const format=(v:any)=>formatDateTime(v);
+const format=(v:any)=>v?new Date(v).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
 let timer:number|undefined;let refreshTimer:number|undefined;
 async function load(){loading.value=true;error.value='';try{const d=await api.get(`/dropping-odds?minDrop=${minDrop.value}`);rows.value=d.data||[];countdown.value=30}catch(e:any){error.value=e?.message||'Unable to load football odds movement.'}finally{loading.value=false}}
 watch(minDrop,load);watch(marketFilter,()=>{});onMounted(()=>{load();timer=window.setInterval(()=>{countdown.value=Math.max(0,countdown.value-1)},1000);refreshTimer=window.setInterval(load,30000)});onUnmounted(()=>{if(timer)clearInterval(timer);if(refreshTimer)clearInterval(refreshTimer)});
