@@ -126,7 +126,7 @@
         <section v-else-if="activeTab === 'events'" class="mc-panel">
           <div class="mc-panel-head"><div><span class="eyebrow">Timeline</span><h2>Match events</h2></div></div>
           <div v-if="research.events?.length" class="event-list">
-            <div v-for="(event, index) in research.events" :key="event.id || index" class="event-row"><span>{{ event.minute || event.time?.minute || '—' }}'</span><b>{{ event.type?.name || event.type?.developer_name || 'Event' }}</b><span>{{ event.player?.name || event.participant?.name || event.result || '' }}</span></div>
+            <div v-for="(event, index) in research.events" :key="event.id || index" :class="['event-row', eventClass(event)]"><span>{{ event.minute || event.time?.minute || event.time?.seconds || '—' }}'</span><b>{{ eventLabel(event) }}</b><span>{{ eventPlayer(event) }}</span></div>
           </div>
           <EmptyState v-else title="No events recorded" message="Match events will appear here when they are available." icon="•" compact />
         </section>
@@ -198,6 +198,9 @@ function movement(v:any){return v==null?'—':`${Number(v)>0?'+':''}${Number(v).
 function movementClass(v:any){return v==null?'muted':Number(v)<0?'move-down':'move-up'}
 function oddKey(o:any){return `${o.bookmakerId||0}-${o.marketId||0}-${o.label}`}
 function predictionPath(id:string){return `/predictions/${id}`}
+function eventLabel(event:any){const value=event.type?.name||event.type?.developer_name||event.type_name||event.name||'Match event';return String(value).replace(/_/g,' ')}
+function eventPlayer(event:any){return event.player?.name||event.player_name||event.participant?.name||event.assist?.name||event.result||event.team?.name||''}
+function eventClass(event:any){const value=eventLabel(event).toLowerCase();return value.includes('yellow')?'yellow-card':value.includes('red')?'red-card':value.includes('goal')?'goal-event':value.includes('sub')?'sub-event':''}
 function standingName(id:any){return id===home.value.externalId?home.value.name:id===away.value.externalId?away.value.name:'Team'}
 async function load(){
   loading.value=true;
@@ -213,6 +216,6 @@ async function load(){
   } catch(e){ match.value=null; } finally { loading.value=false; }
 }
 watch(() => route.fullPath, () => { load(); });
-onMounted(async () => { await load(); refreshTimer = window.setInterval(async () => { if (match.value?.status === 'live') { try { const id=String(route.params.id); const [m,o]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds?mode=inplay`)]); match.value=m.data; if ((o.data||[]).length) odds.value=o.data; } catch {} } }, 30000); });
+onMounted(async () => { await load(); refreshTimer = window.setInterval(async () => { if (match.value?.status === 'live') { try { const id=String(route.params.id); const [m,o,r]=await Promise.all([api.get(`/matches/${id}`),api.get(`/matches/${id}/odds?mode=inplay`),api.get(`/matches/${id}/research`)]); match.value=m.data; research.value=r.data||research.value; if ((o.data||[]).length) odds.value=o.data; } catch {} } }, 15000); });
 onUnmounted(() => { if (refreshTimer) window.clearInterval(refreshTimer); });
 </script>
