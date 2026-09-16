@@ -1,0 +1,1 @@
+<template><section class="pro-panel"><span class="eyebrow">Member workspace</span><h1>{{title}}</h1><p>{{description}}</p><RouterLink :to="actionTo" class="btn">{{action}}</RouterLink></section></template><script setup lang="ts">import{RouterLink}from'vue-router';defineProps<{title:string;description:string;action:string;actionTo:string}>();</script>

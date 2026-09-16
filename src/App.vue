@@ -126,7 +126,7 @@ const mobileOpen=ref(false);
 const isDark=ref(false);
 function applyTheme(dark:boolean){isDark.value=dark;document.documentElement.dataset.theme=dark?'dark':'light';localStorage.setItem('bratips-theme',dark?'dark':'light');}
 function toggleTheme(){applyTheme(!isDark.value);}
-onMounted(()=>{const saved=localStorage.getItem('bratips-theme'); applyTheme(saved ? saved==='dark' : window.matchMedia?.('(prefers-color-scheme: dark)').matches===true);});
+onMounted(()=>{const saved=localStorage.getItem('bratips-theme'); applyTheme(saved ? saved==='dark' : false);});
 const accountOpen=ref(false);
 const closeMobile=()=>{mobileOpen.value=false};
 
