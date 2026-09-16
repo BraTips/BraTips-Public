@@ -66,7 +66,7 @@
             </div>
             <NotificationBell/>
             <button class="theme-toggle" type="button" :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'" :title="isDark ? 'Light mode' : 'Dark mode'" @click="toggleTheme"><span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span></button>
-            <button class="ghost nav-logout" @click="auth.logout">Log out</button>
+            <button class="ghost nav-logout" @click="handleLogout">Log out</button>
           </template>
           <template v-else>
             <button class="theme-toggle" type="button" :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'" :title="isDark ? 'Light mode' : 'Dark mode'" @click="toggleTheme"><span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span></button>
@@ -117,19 +117,22 @@
 
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
-import {RouterLink,RouterView,useRoute} from 'vue-router';
+import {RouterLink,RouterView,useRoute,useRouter} from 'vue-router';
 import {useAuth} from './stores/auth';
 import NotificationBell from './components/NotificationBell.vue';
 import BrandedConfirmModal from './components/BrandedConfirmModal.vue';
 import BrandedToast from './components/BrandedToast.vue';
 const auth=useAuth();
 const route=useRoute();
+const router=useRouter();
 const mobileOpen=ref(false);
 const isDark=ref(false);
 function applyTheme(dark:boolean){isDark.value=dark;document.documentElement.dataset.theme=dark?'dark':'light';localStorage.setItem('bratips-theme',dark?'dark':'light');}
 function toggleTheme(){applyTheme(!isDark.value);}
 onMounted(()=>{const saved=localStorage.getItem('bratips-theme'); applyTheme(saved ? saved==='dark' : false);});
 const accountOpen=ref(false);
+function handleLogout(){auth.logout();router.push({path:'/login',query:{redirect:route.fullPath}})}
+function handleSessionExpired(){if(!auth.isLoggedIn)return;auth.user=null;router.push({path:'/login',query:{redirect:route.fullPath}})}
 const closeMobile=()=>{mobileOpen.value=false};
 
 // Desktop "Tips / Tipsters / Tools" dropdowns.
@@ -144,8 +147,8 @@ function onDocClick(e:MouseEvent){
   if(desktopNavEl.value && !desktopNavEl.value.contains(e.target as Node)) closeMenu();
 }
 function onKeydown(e:KeyboardEvent){ if(e.key==='Escape') closeMenu(); }
-onMounted(()=>{document.addEventListener('click', onDocClick); document.addEventListener('keydown', onKeydown)});
-onUnmounted(()=>{document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKeydown)});
+onMounted(()=>{document.addEventListener('click', onDocClick); document.addEventListener('keydown', onKeydown); window.addEventListener('bratips:session-expired', handleSessionExpired)});
+onUnmounted(()=>{document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKeydown); window.removeEventListener('bratips:session-expired', handleSessionExpired)});
 
 watch(()=>route.path, ()=>{closeMobile(); closeMenu(); accountOpen.value=false;});
 const minimalChrome=computed(()=>['/login','/signup','/tipster-signup'].includes(route.path));
