@@ -1,13 +1,109 @@
 <template>
   <div class="dash-page">
-    <section class="td-hero pro-panel"><div class="td-hero-main"><div class="td-avatar">{{ initials(tipster?.username || auth.user?.name || 'T') }}</div><div><span class="eyebrow">Tipster control centre</span><h1>{{ tipster?.username || auth.user?.name || 'Tipster' }}</h1><p>Manage your football selections, monitor performance and keep your publishing pipeline moving.</p><div class="td-status"><i></i> Active tipster account <span>•</span> Admin review enabled</div></div></div><div class="td-hero-actions"><RouterLink to="/tipsters" class="ghost">View tipsters</RouterLink><RouterLink to="/tipster-dashboard/create-prediction" class="btn">+ New prediction</RouterLink></div></section>
-    <section class="td-kpis"><div class="td-kpi"><span>Total tips</span><b>{{ tipster?.totalTips || 0 }}</b><small>published selections</small></div><div class="td-kpi"><span>Win rate</span><b>{{ winRate }}%</b><small>{{ tipster?.wins || 0 }} wins · {{ tipster?.losses || 0 }} losses</small></div><div class="td-kpi"><span>Current streak</span><b>{{ tipster?.currentStreak || 0 }}</b><small>consecutive wins</small></div><div class="td-kpi"><span>Pending review</span><b>{{ pendingCount }}</b><small>awaiting admin approval</small></div></section>
-    <div class="td-grid"><main><section class="pro-panel"><div class="pro-section-head"><div><span class="eyebrow">Publishing pipeline</span><h2>Recent submissions</h2></div><RouterLink to="/tipster-dashboard/predictions">View all →</RouterLink></div><div v-if="predictions.length" class="td-table"><div class="td-table-head"><span>Fixture</span><span>Selection</span><span>Odds</span><span>Status</span></div><div v-for="p in predictions.slice(0,6)" :key="p._id" class="td-table-row"><div><b>{{ p.fixture || 'Football match' }}</b><small>{{ formatDate(p.createdAt) }}</small></div><span>{{ p.prediction }}</span><strong>{{ Number(p.odds || 0).toFixed(2) }}</strong><em :class="'td-status-pill '+p.status">{{ statusLabel(p.status) }}</em></div></div><div v-else class="empty">Your submitted predictions will appear here.</div></section></main><aside><section class="pro-panel td-record"><div class="pro-section-head"><div><span class="eyebrow">Performance</span><h2>Your record</h2></div></div><div class="td-record-score"><div><b>{{ winRate }}%</b><span>win rate</span></div><div class="td-ring"><span>{{ tipster?.wins || 0 }}</span><small>WINS</small></div></div><div class="td-mini-stats"><div><span>Longest streak</span><b>{{ tipster?.longestStreak || 0 }}</b></div><div><span>ROI</span><b>{{ formatPercent(tipster?.roi) }}</b></div><div><span>Profit</span><b>{{ formatProfit(tipster?.profit) }}</b></div></div></section><section class="pro-panel"><span class="eyebrow">Published picks</span><h3>{{ publishedCount }}</h3><p>Your approved selections are already live. They do not need to be resubmitted.</p><RouterLink to="/tipster-dashboard/predictions" class="ghost">Manage predictions →</RouterLink></section></aside></div>
+    <section class="td-hero pro-panel">
+      <div class="td-hero-main">
+        <div class="td-avatar">{{ initials(tipster?.username || auth.user?.name || 'T') }}</div>
+        <div>
+          <span class="eyebrow">Tipster control centre</span>
+          <h1>{{ tipster?.username || auth.user?.name || 'Tipster' }}</h1>
+          <p>Manage your football selections, monitor performance and keep your publishing pipeline moving.</p>
+          <div class="td-status"><i></i> Active tipster account <span>•</span> Admin review enabled</div>
+        </div>
+      </div>
+      <div class="td-hero-actions">
+        <RouterLink to="/tipsters" class="ghost">View tipsters</RouterLink>
+        <RouterLink to="/tipster-dashboard/create-prediction" class="btn">+ New prediction</RouterLink>
+      </div>
+    </section>
+
+    <section class="td-kpis">
+      <div class="td-kpi"><span>Total tips</span><b>{{ tipster?.totalTips || 0 }}</b><small>published selections</small></div>
+      <div class="td-kpi"><span>Win rate</span><b>{{ winRate }}%</b><small>{{ tipster?.wins || 0 }} wins · {{ tipster?.losses || 0 }} losses</small></div>
+      <div class="td-kpi"><span>Current streak</span><b>{{ tipster?.currentStreak || 0 }}</b><small>consecutive wins</small></div>
+      <div class="td-kpi"><span>Pending review</span><b>{{ pendingCount }}</b><small>awaiting admin approval</small></div>
+    </section>
+
+    <section v-if="publishedCount" class="td-published-banner">
+      <div class="td-published-copy">
+        <span class="td-published-dot" aria-hidden="true"></span>
+        <div>
+          <span class="eyebrow">Published picks</span>
+          <h3>{{ publishedCount }} live {{ publishedCount === 1 ? 'selection' : 'selections' }}</h3>
+          <p>Your approved selections are already live. They do not need to be resubmitted.</p>
+        </div>
+      </div>
+      <RouterLink to="/tipster-dashboard/predictions" class="ghost">Manage predictions →</RouterLink>
+    </section>
+
+    <div class="td-grid">
+      <main>
+        <section class="pro-panel">
+          <div class="pro-section-head">
+            <div><span class="eyebrow">Publishing pipeline</span><h2>Recent submissions</h2></div>
+            <RouterLink to="/tipster-dashboard/predictions">View all →</RouterLink>
+          </div>
+          <div v-if="predictions.length" class="td-table">
+            <div class="td-table-head"><span>Fixture</span><span>Selection</span><span>Odds</span><span>Status</span></div>
+            <div v-for="p in predictions.slice(0,6)" :key="p._id" class="td-table-row">
+              <div><b>{{ p.fixture || 'Football match' }}</b><small>{{ formatDate(p.createdAt) }}</small></div>
+              <span>{{ p.prediction }}</span>
+              <strong>{{ Number(p.odds || 0).toFixed(2) }}</strong>
+              <em :class="'td-status-pill '+p.status">{{ statusLabel(p.status) }}</em>
+            </div>
+          </div>
+          <div v-else class="empty">Your submitted predictions will appear here.</div>
+        </section>
+      </main>
+
+      <aside>
+        <section class="pro-panel td-record">
+          <div class="pro-section-head">
+            <div><span class="eyebrow">Performance</span><h2>Your record</h2></div>
+          </div>
+          <div class="td-record-score">
+            <div><b>{{ winRate }}%</b><span>win rate</span></div>
+            <div class="td-ring"><span>{{ tipster?.wins || 0 }}</span><small>WINS</small></div>
+          </div>
+          <div class="td-mini-stats">
+            <div><span>Longest streak</span><b>{{ tipster?.longestStreak || 0 }}</b></div>
+            <div><span>ROI</span><b>{{ formatPercent(tipster?.roi) }}</b></div>
+            <div><span>Profit</span><b>{{ formatProfit(tipster?.profit) }}</b></div>
+          </div>
+        </section>
+      </aside>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'; import { RouterLink } from 'vue-router'; import { useAuth } from '../stores/auth'; import { api } from '../services/api'; import { formatDate, formatPercent, formatProfit } from '../utils/formatters';
-const auth=useAuth(); const tipster=ref<any>(null); const predictions=ref<any[]>([]); const publishedCount=computed(()=>predictions.value.filter(x=>['published','won','lost','void'].includes(x.status)).length); const pendingCount=computed(()=>predictions.value.filter(x=>['pending','under_review'].includes(x.status)).length); const winRate=computed(()=>{const w=Number(tipster.value?.wins||0),l=Number(tipster.value?.losses||0);return w+l?Math.round(w/(w+l)*100):0});
-function initials(v:string){return v.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'T'} function statusLabel(v:string){return v==='published'?'Published':v==='won'?'Won':v==='lost'?'Lost':v==='void'?'Void':'Pending'}
-onMounted(async()=>{try{const d=await api.get('/me/tipster');tipster.value=d.data.profile;predictions.value=d.data.predictions||[]}catch{}})
+import { computed, onMounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
+import { useAuth } from '../stores/auth';
+import { api } from '../services/api';
+import { formatDate, formatPercent, formatProfit } from '../utils/formatters';
+
+const auth = useAuth();
+const tipster = ref<any>(null);
+const predictions = ref<any[]>([]);
+const publishedCount = computed(() => predictions.value.filter(x => ['published','won','lost','void'].includes(x.status)).length);
+const pendingCount = computed(() => predictions.value.filter(x => ['pending','under_review'].includes(x.status)).length);
+const winRate = computed(() => {
+  const w = Number(tipster.value?.wins || 0), l = Number(tipster.value?.losses || 0);
+  return w + l ? Math.round(w / (w + l) * 100) : 0;
+});
+
+function initials(v:string){
+  return v.split(/\s+/).filter(Boolean).slice(0,2).map(x => x[0]).join('').toUpperCase() || 'T';
+}
+
+function statusLabel(v:string){
+  return v === 'published' ? 'Published' : v === 'won' ? 'Won' : v === 'lost' ? 'Lost' : v === 'void' ? 'Void' : 'Pending';
+}
+
+onMounted(async () => {
+  try {
+    const d = await api.get('/me/tipster');
+    tipster.value = d.data.profile;
+    predictions.value = d.data.predictions || [];
+  } catch {}
+});
 </script>
