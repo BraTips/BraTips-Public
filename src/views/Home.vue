@@ -204,7 +204,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import TeamLogo from '../components/TeamLogo.vue'
@@ -245,6 +245,8 @@ function winLossDots(t:any){
   const greenCount=played>0 ? Math.round((wins/played)*total) : 0
   return Array.from({length:total},(_,i)=>i<greenCount)
 }
+let liveTimer:number|undefined
+async function loadLiveMatches(){try{const r=await api.get('/matches/live');liveMatches.value=r.data||[]}catch{}}
 onMounted(async()=>{
   // Bet of the Day + today's matches: stale-while-revalidate. Any cached copy renders
   // instantly (no skeleton), and if the background refetch comes back different, the
@@ -275,8 +277,10 @@ onMounted(async()=>{
 
   // Live matches, drop count and win rate change constantly, so they're intentionally
   // not cached (see cacheTtl in services/api.ts) and just load in the background.
-  api.get('/matches/live').then((r:any)=>{liveMatches.value=r.data||[]}).catch(()=>{})
+  loadLiveMatches()
+  liveTimer=window.setInterval(loadLiveMatches,60_000)
   api.get('/prediction-history?limit=1').then((r:any)=>{settledWinRate.value=Math.round(Number(r.stats?.winRate||0))}).catch(()=>{})
   api.get('/dropping-odds?minDrop=5').then((r:any)=>{dropCount.value=(r.data||[]).length}).catch(()=>{})
 })
+onUnmounted(()=>{if(liveTimer!==undefined)window.clearInterval(liveTimer)})
 </script>
