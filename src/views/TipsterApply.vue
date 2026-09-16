@@ -43,7 +43,7 @@
               </div>
               <div class="tipster-fields two">
                 <div class="auth-field"><label for="tip-email">Email address</label><div class="auth-input-wrap"><span>✉</span><input id="tip-email" v-model="f.email" type="email" autocomplete="email" placeholder="you@example.com" required /></div></div>
-                <div class="auth-field"><label for="tip-password">Password</label><div class="auth-input-wrap"><span>●</span><input id="tip-password" v-model="f.password" type="password" autocomplete="new-password" placeholder="8+ characters" minlength="8" required /></div></div>
+                <div class="auth-field"><label for="tip-password">Password</label><div class="auth-input-wrap"><span>●</span><input id="tip-password" v-model="f.password" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="8+ characters" minlength="8" required /><button type="button" class="password-toggle" :aria-label="showPassword ? 'Hide password' : 'Show password'" :title="showPassword ? 'Hide password' : 'Show password'" @click="showPassword = !showPassword">◉</button></div></div>
               </div>
               <div class="tipster-fields two">
                 <div class="auth-field"><label for="tip-country">Country</label><div class="auth-input-wrap"><span>⌖</span><input id="tip-country" v-model="f.country" placeholder="Country" /></div></div>
@@ -86,6 +86,7 @@ const error = ref('')
 const success = ref('')
 const expertise = ref('')
 const busy = ref(false)
+const showPassword = ref(false)
 const f = reactive<any>({ name: '', username: '', email: '', password: '', country: '', bio: '', samplePrediction: { fixture: '', prediction: '', odds: 1.5, analysis: '' } })
 
 async function submit() {

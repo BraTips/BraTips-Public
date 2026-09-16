@@ -34,7 +34,7 @@
           </div>
           <div class="auth-field">
             <div class="auth-label-row"><label for="login-password">Password</label><span class="auth-hint">8+ characters</span></div>
-            <div class="auth-input-wrap"><span>●</span><input id="login-password" v-model="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /></div>
+            <div class="auth-input-wrap"><span>●</span><input id="login-password" v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" placeholder="Enter your password" required /><button type="button" class="password-toggle" :aria-label="showPassword ? 'Hide password' : 'Show password'" :title="showPassword ? 'Hide password' : 'Show password'" @click="showPassword = !showPassword">◉</button></div>
           </div>
           <button class="auth-submit" type="submit" :disabled="busy"><span>{{ busy ? 'Signing in…' : 'Log in to BraTipsters' }}</span><b>→</b></button>
         </form>
@@ -59,6 +59,7 @@ const route = useRoute()
 const router = useRouter()
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const error = ref('')
 const busy = ref(false)
 

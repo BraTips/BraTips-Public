@@ -60,6 +60,7 @@ html{scroll-behavior:smooth}.page-animate{animation:pageIn .55s ease both}.revea
 @media(max-width:620px){.auth-panel{padding:25px 16px}.auth-heading h2{font-size:30px}.tipster-apply-hero{padding:32px 0}.tipster-apply-hero h1{font-size:31px}.tipster-apply-body{padding-top:16px}.tipster-apply-side{grid-template-columns:1fr}.tipster-apply-card{padding:17px}.tipster-fields.two{grid-template-columns:1fr}.tipster-form-head{display:block}.tipster-form-badge{display:inline-block;margin-top:12px}.auth-tipster-cta{line-height:1.6}}
 
 .tipster-auth-brand{display:inline-block;margin-bottom:28px}.tipster-auth-brand img{width:154px;height:auto;display:block}.tipster-auth-brand:hover{opacity:.92}
+.auth-input-wrap{position:relative}.auth-input-wrap input{min-width:0;padding-right:42px}.password-toggle{width:30px;height:30px;position:absolute;right:8px;top:50%;display:grid;place-items:center;transform:translateY(-50%);border:0;border-radius:8px;background:transparent;color:#7c8798;font-size:16px;line-height:1;cursor:pointer}.password-toggle:hover,.password-toggle:focus-visible{background:#f2f4f8;color:var(--pink);outline:none}
 /* Light-background auth logo: never invert the logo; the white-panel variant has dark Bra text. */
 .auth-mobile-brand img{height:auto;display:inline-block}
 /* BraTipsters brand system — football-first, premium and consistent */
