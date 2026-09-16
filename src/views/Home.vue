@@ -53,10 +53,10 @@
                 <small>{{ p.tipsterId?.name || 'Tipster' }} · {{ p.league || p.matchId?.leagueId?.name || 'Football' }}</small>
               </div>
               <div class="weekly-pick" :class="{locked:p.locked}">
-                <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? '♛ PREMIUM' : 'TIPSTER PICK' }}</span>
+                <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? 'PREMIUM TIP' : 'TIPSTER PICK' }}</span>
                 <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
-                <strong v-else>🔒</strong>
+                <strong v-else>Locked</strong>
               </div>
               <div class="weekly-arrow">›</div>
             </RouterLink>
@@ -117,10 +117,10 @@
                 <small>{{ p.league || p.matchId?.leagueId?.name || 'Football' }}</small>
               </div>
               <div class="weekly-pick" :class="{locked:p.locked}">
-                <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? '♛ PREMIUM' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
+                <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? 'PREMIUM TIP' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
                 <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
-                <strong v-else>🔒</strong>
+                <strong v-else>Locked</strong>
               </div>
               <div class="weekly-arrow">›</div>
             </RouterLink>
@@ -153,7 +153,7 @@
           <RouterLink to="/dropping-odds" class="tool-card drop-tool"><span class="tool-icon">↓</span><div><small>Market signal</small><h3>Dropping Odds</h3><p>Find selections whose prices are moving lower.</p></div><b>→</b></RouterLink>
           <RouterLink to="/bet-of-the-day" class="tool-card"><span class="tool-icon">✦</span><div><small>Daily feature</small><h3>Bet of the Day</h3><p>Follow today's highlighted BraTipsters selections.</p></div><b>→</b></RouterLink>
           <RouterLink to="/history" class="tool-card"><span class="tool-icon">↗</span><div><small>Track record</small><h3>Prediction History</h3><p>See settled picks and the public record.</p></div><b>→</b></RouterLink>
-          <RouterLink to="/subscription" class="tool-card premium-tool"><span class="tool-icon">★</span><div><small>Premium</small><h3>Unlock BraTipsters</h3><p>Access deeper market and prediction research.</p></div><b>→</b></RouterLink>
+          <RouterLink to="/subscription" class="tool-card premium-tool"><span class="tool-icon premium-icon-mark">🔒</span><div><small>Premium</small><h3>Unlock BraTipsters</h3><p>Access deeper market and prediction research.</p></div><b>→</b></RouterLink>
         </section>
       </main>
 
@@ -172,7 +172,7 @@
           </RouterLink>
           <div v-if="!topTipsters.length" class="empty-state">Tipster performance will appear here as results accumulate.</div>
         </template>
-        <div class="premium-callout"><span>★</span><div><b>Go deeper with Premium</b><p>Match research, market intelligence and premium picks.</p><RouterLink to="/subscription">See plans →</RouterLink></div></div>
+        <div class="premium-callout"><span class="premium-icon-mark">🔒</span><div><b>Go deeper with Premium</b><p>Match research, market intelligence and premium picks.</p><RouterLink to="/subscription">See plans →</RouterLink></div></div>
       </aside>
     </section>
 

@@ -4,7 +4,7 @@
     <EmptyState v-else-if="!prediction" title="Prediction not found" message="This tipster prediction may have been removed or is no longer available." icon="⌕"><template #action><RouterLink to="/" class="btn">Back to home</RouterLink></template></EmptyState>
     <template v-else>
       <RouterLink to="/" class="back-soft">← Back to home</RouterLink>
-      <section v-if="prediction.locked" class="pro-panel tipster-prediction-locked"><span class="eyebrow">Tipster prediction</span><h1>Premium selection locked</h1><p>{{ fixture }}</p><p class="muted">Subscribe to Premium to reveal this tipster's selection and quoted odds.</p><RouterLink to="/subscription" class="btn">Unlock Premium</RouterLink></section>
+      <section v-if="prediction.locked" class="pro-panel tipster-prediction-locked"><span class="premium-badge">PREMIUM TIP</span><h1>Premium selection locked</h1><p>{{ fixture }}</p><p class="muted">Subscribe to Premium to reveal this tipster's selection and quoted odds.</p><RouterLink to="/subscription" class="btn">Unlock Premium</RouterLink></section>
       <template v-else>
         <section class="tipster-prediction-hero"><div><span class="eyebrow">Tipster prediction</span><h1>{{ prediction.prediction }}</h1><p>{{ fixture }}</p></div><div class="tipster-prediction-result"><span>{{ prediction.status || 'published' }}</span><strong>{{ formatOdds(prediction.odds) }}</strong><small>Quoted odds</small></div></section>
         <div class="tipster-prediction-layout"><main>

@@ -81,7 +81,7 @@
             </div>
 
             <div class="pmc-prediction" :class="{premium:predictionFor(m._id)?.isPremium}">
-              <div class="pmc-prediction-head"><span>✦ BRATIPSTERS PICK</span><b v-if="predictionFor(m._id)?.isPremium">PREMIUM</b></div>
+              <div class="pmc-prediction-head"><span>✦ BRATIPSTERS PICK</span><b v-if="predictionFor(m._id)?.isPremium" class="premium-badge">PREMIUM TIP</b></div>
               <template v-if="predictionFor(m._id) && !predictionFor(m._id).locked">
                 <div class="pmc-pick"><strong>{{predictionFor(m._id).prediction}}</strong><span>{{price(predictionFor(m._id).odds)}} odds</span></div>
                 <div class="pmc-metrics">
@@ -91,7 +91,7 @@
                 </div>
               </template>
               <template v-else-if="predictionFor(m._id)?.locked">
-                <div class="pmc-locked"><span>🔒</span><div><strong>Premium pick locked</strong><small>Subscribe to reveal selection and odds.</small></div></div>
+                <div class="pmc-locked"><span class="premium-icon-mark">🔒</span><div><strong>Premium pick locked</strong><small>Subscribe to reveal selection and odds.</small></div></div>
               </template>
               <template v-else>
                 <div class="pmc-preparing"><span>✦</span><div><strong>Prediction being prepared</strong><small>Open the match centre for the latest model.</small></div></div>

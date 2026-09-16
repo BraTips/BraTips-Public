@@ -66,7 +66,7 @@
                 <h3>{{ selectedPrediction.locked ? 'Premium prediction locked' : selectedPrediction.prediction }}</h3>
                 <p v-if="selectedPrediction.league || selectedPrediction.matchId?.leagueId?.name" class="muted">{{ selectedPrediction.league || selectedPrediction.matchId?.leagueId?.name }}</p>
               </div>
-              <div class="selected-pick-odds"><span>Tipster odds</span><strong>{{ selectedPrediction.locked ? '🔒' : price(selectedPrediction.odds) }}</strong></div>
+              <div class="selected-pick-odds"><span>Tipster odds</span><strong :class="{ 'premium-odds-lock': selectedPrediction.locked }">{{ selectedPrediction.locked ? 'PREMIUM TIP' : price(selectedPrediction.odds) }}</strong></div>
             </div>
             <div v-if="selectedPrediction.locked" class="selected-pick-locked">Subscribe to Premium to reveal this tipster's selection and quoted odds.</div>
             <div v-else class="selected-pick-reasoning">
@@ -82,7 +82,7 @@
           <div class="mc-panel">
             <div class="mc-panel-head"><div><span class="eyebrow">BraTipsters insight</span><h2>Predictions</h2></div></div>
             <RouterLink v-for="p in predictions" :key="p._id" :to="p.locked ? '/subscription' : predictionPath(p._id)" :class="['tip-row','bratips-detail-prediction',{locked:p.locked}]">
-              <div><b>{{ p.locked ? 'Premium prediction locked' : p.prediction }}</b><span>{{ p.locked ? 'Subscribe to reveal the selection and odds' : (p.systemGenerated ? 'BraTipsters model' : (p.tipsterId?.name || 'BraTipsters tipster')) }}</span></div><strong>{{ p.locked ? '🔒' : price(p.odds) }}</strong>
+              <div><b>{{ p.locked ? 'Premium prediction locked' : p.prediction }}</b><span>{{ p.locked ? 'Subscribe to reveal the selection and odds' : (p.systemGenerated ? 'BraTipsters model' : (p.tipsterId?.name || 'BraTipsters tipster')) }}</span></div><strong :class="{ 'premium-odds-lock': p.locked }">{{ p.locked ? 'PREMIUM TIP' : price(p.odds) }}</strong>
             </RouterLink>
             <EmptyState v-if="!predictions.length" title="Prediction being prepared" message="BraTipsters is preparing the model for this fixture. Refresh in a moment." icon="✦" compact />
           </div>

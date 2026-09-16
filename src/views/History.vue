@@ -23,7 +23,7 @@
           <small>{{p.matchId?.leagueId?.name||p.league||'Football'}}</small>
         </RouterLink>
         <div v-else class="history-fixture-pro"><div class="history-fixture-text">{{p.fixture}}</div><small>{{p.league||'Football'}}</small></div>
-        <div class="history-selection"><span v-if="p.isPremium" class="premium-tip">🔒 PREMIUM TIP</span><strong v-else>{{p.prediction}}</strong><small v-if="p.isPremium">{{p.prediction}}</small></div>
+        <div class="history-selection"><span v-if="p.isPremium" class="premium-tip">PREMIUM TIP</span><strong v-else>{{p.prediction}}</strong><small v-if="p.isPremium">{{p.prediction}}</small></div>
         <RouterLink v-if="p.tipsterId?.name" :to="`/tipsters/${p.tipsterId.name}`" class="history-tipster">@{{p.tipsterId.name}}</RouterLink><span v-else class="history-tipster">@tipster</span>
         <span :class="['history-outcome',p.status]">{{statusLabel(p.status)}}</span>
         <div class="history-odds">{{formatOdds(p.odds)}}</div>
