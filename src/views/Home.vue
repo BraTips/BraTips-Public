@@ -257,8 +257,8 @@ onMounted(async()=>{
   api.getSWR('/matches/today', (fresh:any)=>{matches.value=fresh.data||[]})
     .then((r:any)=>{matches.value=r.data||[]}).catch(()=>{}).finally(()=>{loading.value.matches=false})
 
-  api.get('/predictions?limit=50&tipster=true&upcoming=true&refresh=1')
-    .then((r:any)=>{tipsterPredictions.value=(r.data||[]).slice(0,8)})
+  api.get('/predictions?limit=50&tipster=true&refresh=1')
+    .then((r:any)=>{tipsterPredictions.value=(r.data||[]).filter((p:any)=>p.matchId?.status==='live'||p.matchId?.status==='scheduled').slice(0,8)})
     .catch(()=>{})
     .finally(()=>{loading.value.tipstersPredictions=false})
 
