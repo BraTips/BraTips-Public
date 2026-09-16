@@ -7,7 +7,7 @@
         <div class="pro-profile-hero">
           <div class="pro-profile-main">
             <div class="profile-big">{{ profile.username?.[0]?.toUpperCase() }}</div>
-            <div><span class="eyebrow">Verified performance profile</span><h1>@{{ profile.username }}</h1><p>{{ profile.bio || 'Football analysis and transparent prediction history.' }}</p><div class="profile-actions"><button class="btn" @click="toggleFollow">{{ following ? 'Following ✓' : 'Follow tipster' }}</button><RouterLink class="ghost" to="/history">Public history</RouterLink></div></div>
+            <div><span class="eyebrow">Verified performance profile</span><h1>@{{ profile.username }}</h1><p>{{ profile.bio || 'Football analysis and transparent prediction history.' }}</p><div class="profile-actions"><RouterLink v-if="isOwnProfile" class="btn" to="/tipster-dashboard/profile">Edit Profile</RouterLink><button v-else class="btn" @click="toggleFollow">{{ following ? 'Following ✓' : 'Follow tipster' }}</button><RouterLink class="ghost" to="/history">Public history</RouterLink></div></div>
           </div>
           <div class="profile-record"><span>Current streak</span><b>{{ profile.currentStreak || 0 }}</b><small>Best {{ profile.longestStreak || 0 }}</small></div>
         </div>
@@ -47,6 +47,7 @@ const {ask}=useConfirm();const {show:toast}=useToast();
 
 const route=useRoute(), router=useRouter(), auth=useAuth();
 const profile=ref<any>(null), picks=ref<any[]>([]), following=ref(false), loading=ref(true), error=ref('');
+const isOwnProfile=computed(()=>Boolean(auth.user?.id && profile.value?.userId && String(auth.user._id)===String(profile.value.userId)));
 const rate=computed(()=>profile.value?.totalTips ? Math.round(profile.value.wins/profile.value.totalTips*1000)/10 : 0);
 // Real recent-form strip (not an estimate): this tipster's actual last 8 settled
 // (won/lost) picks, oldest to newest left-to-right. `picks` already comes sorted
@@ -55,7 +56,7 @@ const recentForm=computed(()=>picks.value.filter((p:any)=>p.status==='won'||p.st
 function play(){ if(auth.isLoggedIn) router.push('/dashboard'); else router.push({path:'/login',query:{redirect:route.fullPath}}); }
 async function loadFollow(){
   following.value=false;
-  if(!auth.isLoggedIn || !profile.value?.userId) return;
+  if(!auth.isLoggedIn || !profile.value?.userId || isOwnProfile.value) return;
   try { const d=await api.get('/me/follows'); following.value=(d.data||[]).some((x:any)=>String(x.tipsterId?._id||x.tipsterId)===String(profile.value.userId)); } catch { toast('Your follow status could not be refreshed.','error','Tipster') }
 }
 async function load(){
@@ -65,6 +66,7 @@ async function load(){
   finally { loading.value=false; }
 }
 async function toggleFollow(){
+  if(isOwnProfile.value) return;
   if(!auth.isLoggedIn){ router.push({path:'/login',query:{redirect:route.fullPath}}); return; }
   try { if(following.value){ await api.delete(`/me/follows/${profile.value.userId}`); following.value=false; } else { await api.post(`/me/follows/${profile.value.userId}`,{}); following.value=true; } }
   catch(e:any){ await ask({title:'BraTipsters',message:e?.message||'Unable to complete this action.',confirmText:'Close',cancelText:'Dismiss',danger:true}); }

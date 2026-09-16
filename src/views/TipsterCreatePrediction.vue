@@ -18,8 +18,7 @@
 
         <div class="field">
           <label>Upcoming fixture</label>
-          <div v-if="matchesLoading" class="match-picker-loading">Loading upcoming fixtures…</div>
-          <div v-else class="match-picker" @keydown.esc="matchMenuOpen = false">
+          <div class="match-picker" @keydown.esc="matchMenuOpen = false">
             <button
               type="button"
               class="match-picker-trigger"
@@ -58,6 +57,8 @@
                   @click.stop
                 />
               </div>
+
+              <div v-if="matchesLoading && !upcomingMatches.length" class="match-picker-inline-loading">Loading upcoming fixtures…</div>
 
               <button
                 v-for="m in filteredMatches"
