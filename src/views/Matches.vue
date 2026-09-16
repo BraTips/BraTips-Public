@@ -16,7 +16,7 @@
 
       <section class="football-controls">
         <div class="football-day-tabs" role="tablist" aria-label="Match view">
-          <button v-for="x in tabs" :key="x.v" :class="['football-day-tab', {active:tab===x.v}]" @click="tab=x.v">
+            <button v-for="x in tabs" :key="x.v" type="button" :class="['football-day-tab', {active:tab===x.v}]" :aria-selected="tab===x.v" @click="tab=x.v">
             <span class="day-icon">{{x.icon}}</span>{{x.l}}
           </button>
         </div>
@@ -110,7 +110,7 @@
 <script setup lang="ts">
 import {computed,onMounted,onUnmounted,ref,watch} from 'vue';import {RouterLink} from 'vue-router';import {api} from '../services/api';import TeamLogo from '../components/TeamLogo.vue';import {formatTime,formatDate,formatOdds} from '../utils/formatters';
 const tabs=[{v:'today',l:'Today',icon:'●'},{v:'live',l:'Live',icon:'◉'},{v:'scheduled',l:'Upcoming',icon:'→'},{v:'finished',l:'Results',icon:'✓'}];
-const tab=ref('today'),matches=ref<any[]>([]),predictions=ref<any[]>([]),loading=ref(true),error=ref(''),leagueFilter=ref('all'),marketFilter=ref('all'),lastLiveUpdate=ref('');let refreshTimer:number|undefined;
+const tab=ref('today'),matches=ref<any[]>([]),predictions=ref<any[]>([]),loading=ref(true),error=ref(''),leagueFilter=ref('all'),marketFilter=ref('all'),lastLiveUpdate=ref('');let refreshTimer:number|undefined;const matchCache=new Map<string,any[]>();let predictionsLoaded=false;
 const time=(v:string)=>formatTime(v);
 const dateLabel=(v:string)=>formatDate(v);
 const price=(v:any)=>formatOdds(v);
@@ -126,6 +126,6 @@ const liveWithPredictions=computed(()=>matches.value.filter(m=>m.status==='live'
 const visibleMatches=computed(()=>matches.value);
 const filteredMatches=computed(()=>matches.value.filter(m=>leagueFilter.value==='all'||m.leagueId?.name===leagueFilter.value).filter(m=>marketFilter.value==='all'||predictionFor(m._id)?.prediction===marketFilter.value));
 function startPolling(){if(refreshTimer)window.clearInterval(refreshTimer);const ms=tab.value==='live'?15000:tab.value==='today'?60000:300000;refreshTimer=window.setInterval(load,ms)}
-async function load(){loading.value=matches.value.length===0;error.value='';try{const d=tab.value==='today'?await api.get('/matches/today'):tab.value==='live'?await api.get('/matches/live'):await api.get(`/matches?status=${tab.value}&limit=100`);matches.value=d.data||[];if(tab.value==='live')lastLiveUpdate.value=new Date().toISOString();const p=await api.get('/predictions?limit=100');predictions.value=(p.data||[]).filter((x:any)=>x.systemGenerated||!x.tipsterId);}catch(e:any){if(!matches.value.length)error.value=e?.message||'Unable to load football matches.'}finally{loading.value=false}}
-watch(tab,async()=>{leagueFilter.value='all';marketFilter.value='all';await load();startPolling()});onMounted(async()=>{await load();startPolling()});onUnmounted(()=>{if(refreshTimer)window.clearInterval(refreshTimer)});
+async function load(){const key=tab.value;const cached=matchCache.get(key);if(cached){matches.value=cached}loading.value=!cached;error.value='';try{const endpoint=key==='today'?'/matches/today':key==='live'?'/matches/live':`/matches?status=${key}&limit=100`;const [d,p]=await Promise.all([api.get(endpoint),predictionsLoaded?Promise.resolve(null):api.get('/predictions?limit=100')]);const next=d.data||[];matchCache.set(key,next);matches.value=next;if(p){predictions.value=(p.data||[]).filter((x:any)=>x.systemGenerated||!x.tipsterId);predictionsLoaded=true}if(key==='live')lastLiveUpdate.value=new Date().toISOString()}catch(e:any){if(!matches.value.length)error.value=e?.message||'Unable to load football matches.'}finally{loading.value=false}}
+watch(tab,()=>{leagueFilter.value='all';marketFilter.value='all';load();startPolling()});onMounted(()=>{load();startPolling()});onUnmounted(()=>{if(refreshTimer)window.clearInterval(refreshTimer)});
 </script>
