@@ -52,7 +52,7 @@
                 <div><b>{{ predictionAwayName(p) }}</b><TeamLogo :src="predictionAwayLogo(p)" :name="predictionAwayName(p)" size="sm"/></div>
                 <small>{{ p.tipsterId?.name || 'Tipster' }} · {{ p.league || p.matchId?.leagueId?.name || 'Football' }}</small>
               </div>
-              <div class="weekly-pick" :class="{locked:p.locked}">
+              <div class="weekly-pick" :class="{ 'weekly-pick-locked': p.locked }">
                 <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? 'PREMIUM TIP' : 'TIPSTER PICK' }}</span>
                 <b>{{ p.locked ? 'Selection locked' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
@@ -115,7 +115,7 @@
                 <div><b>{{ predictionAwayName(p) }}</b><TeamLogo :src="predictionAwayLogo(p)" :name="predictionAwayName(p)" size="sm"/></div>
                 <small>{{ p.league || p.matchId?.leagueId?.name || 'Football' }}</small>
               </div>
-              <div class="weekly-pick" :class="{locked:p.locked}">
+              <div class="weekly-pick" :class="{ 'weekly-pick-locked': p.locked }">
                 <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? 'PREMIUM TIP' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
                 <b>{{ p.locked ? 'Selection locked' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
