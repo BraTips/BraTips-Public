@@ -840,3 +840,23 @@ html,body,#app{max-width:100%;overflow-x:hidden}
   .auth-input-wrap input{font-size:16px;min-width:0}
   .field input,.field textarea,.field select,.toolbar input,.toolbar select{max-width:100%;min-width:0}
 }
+
+/* Homepage three-column workspace: keep the navigation and tipster rail stable while the center feed can scroll. */
+@media (min-width: 1051px){
+  .pro-home .home-shell{height:calc(100vh - 102px);min-height:520px;align-items:stretch}
+  .pro-home .home-sidebar,
+  .pro-home .home-right{position:sticky;top:0;align-self:start}
+  .pro-home .home-main{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 6px 30px 0;scrollbar-gutter:stable}
+  .pro-home .weekly-predictions-panel{overflow:hidden}
+  .pro-home .weekly-predictions-panel .weekly-prediction-list{max-height:430px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
+  .pro-home .weekly-predictions-panel .weekly-more{position:sticky;bottom:0}
+}
+@media (min-width: 761px) and (max-width: 1050px){
+  .pro-home .home-main{min-width:0;overflow-x:hidden}
+  .pro-home .weekly-predictions-panel .weekly-prediction-list{max-height:430px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+}
+@media (max-width:760px){
+  .pro-home .home-shell{height:auto;min-height:0}
+  .pro-home .home-main{height:auto;overflow:visible;padding-right:0}
+  .pro-home .weekly-predictions-panel .weekly-prediction-list{max-height:520px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+}
