@@ -91,7 +91,7 @@
                 </div>
               </template>
               <template v-else-if="predictionFor(m._id)?.locked">
-                <div class="pmc-locked"><span class="premium-icon-mark">🔒</span><div><strong>Premium pick locked</strong><small>Subscribe to reveal selection and odds.</small></div></div>
+                <div class="pmc-locked"><strong>Selection locked</strong><small>Subscribe to reveal selection and odds.</small></div>
               </template>
               <template v-else>
                 <div class="pmc-preparing"><span>✦</span><div><strong>Prediction being prepared</strong><small>Open the match centre for the latest model.</small></div></div>

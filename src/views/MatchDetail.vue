@@ -62,14 +62,13 @@
             </div>
             <div class="selected-pick-main">
               <div>
-                <span class="muted small">{{ selectedPrediction.isPremium ? 'Premium selection' : 'Published selection' }}</span>
-                <h3>{{ selectedPrediction.locked ? 'Premium prediction locked' : selectedPrediction.prediction }}</h3>
+                <span v-if="selectedPrediction.isPremium" class="premium-badge">PREMIUM TIP</span><span v-else class="muted small">Published selection</span>
+                <h3>{{ selectedPrediction.locked ? 'Selection locked' : selectedPrediction.prediction }}</h3>
                 <p v-if="selectedPrediction.league || selectedPrediction.matchId?.leagueId?.name" class="muted">{{ selectedPrediction.league || selectedPrediction.matchId?.leagueId?.name }}</p>
               </div>
-              <div class="selected-pick-odds"><span>Tipster odds</span><strong :class="{ 'premium-odds-lock': selectedPrediction.locked }">{{ selectedPrediction.locked ? 'PREMIUM TIP' : price(selectedPrediction.odds) }}</strong></div>
+              <div class="selected-pick-odds"><span>Tipster odds</span><strong>{{ selectedPrediction.locked ? 'Locked' : price(selectedPrediction.odds) }}</strong></div>
             </div>
-            <div v-if="selectedPrediction.locked" class="selected-pick-locked">Subscribe to Premium to reveal this tipster's selection and quoted odds.</div>
-            <div v-else class="selected-pick-reasoning">
+            <div v-if="!selectedPrediction.locked" class="selected-pick-reasoning">
               <div><span class="eyebrow">Why this pick?</span><p>{{ selectedPrediction.analysis || 'The tipster did not publish additional reasoning for this selection.' }}</p></div>
               <div class="selected-pick-meta">
                 <div><span>Confidence</span><b>{{ selectedPrediction.confidence || '—' }}{{ selectedPrediction.confidence ? '%' : '' }}</b></div>
@@ -82,7 +81,7 @@
           <div class="mc-panel">
             <div class="mc-panel-head"><div><span class="eyebrow">BraTipsters insight</span><h2>Predictions</h2></div></div>
             <RouterLink v-for="p in predictions" :key="p._id" :to="p.locked ? '/subscription' : predictionPath(p._id)" :class="['tip-row','bratips-detail-prediction',{locked:p.locked}]">
-              <div><b>{{ p.locked ? 'Premium prediction locked' : p.prediction }}</b><span>{{ p.locked ? 'Subscribe to reveal the selection and odds' : (p.systemGenerated ? 'BraTipsters model' : (p.tipsterId?.name || 'BraTipsters tipster')) }}</span></div><strong :class="{ 'premium-odds-lock': p.locked }">{{ p.locked ? 'PREMIUM TIP' : price(p.odds) }}</strong>
+              <div><b>{{ p.locked ? 'Selection locked' : p.prediction }}</b><span>{{ p.locked ? 'Subscribe to reveal the selection and odds' : (p.systemGenerated ? 'BraTipsters model' : (p.tipsterId?.name || 'BraTipsters tipster')) }}</span></div><strong v-if="p.locked" class="premium-odds-lock">PREMIUM TIP</strong><strong v-else>{{ price(p.odds) }}</strong>
             </RouterLink>
             <EmptyState v-if="!predictions.length" title="Prediction being prepared" message="BraTipsters is preparing the model for this fixture. Refresh in a moment." icon="✦" compact />
           </div>

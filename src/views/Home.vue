@@ -54,9 +54,8 @@
               </div>
               <div class="weekly-pick" :class="{locked:p.locked}">
                 <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? 'PREMIUM TIP' : 'TIPSTER PICK' }}</span>
-                <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
+                <b>{{ p.locked ? 'Selection locked' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
-                <strong v-else>Locked</strong>
               </div>
               <div class="weekly-arrow">›</div>
             </RouterLink>
@@ -118,9 +117,8 @@
               </div>
               <div class="weekly-pick" :class="{locked:p.locked}">
                 <span :class="{ 'premium-badge': p.isPremium }">{{ p.isPremium ? 'PREMIUM TIP' : (p.systemGenerated ? 'BRATIPSTERS MODEL' : 'TIPSTER PICK') }}</span>
-                <b>{{ p.locked ? 'Premium prediction' : p.prediction }}</b>
+                <b>{{ p.locked ? 'Selection locked' : p.prediction }}</b>
                 <strong v-if="!p.locked && p.odds">{{ formatOdds(p.odds) }}</strong>
-                <strong v-else>Locked</strong>
               </div>
               <div class="weekly-arrow">›</div>
             </RouterLink>
