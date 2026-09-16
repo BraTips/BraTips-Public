@@ -1,30 +1,277 @@
 <template>
-  <section class="pro-panel td-submit"><div class="pro-section-head"><div><span class="eyebrow">Publishing desk</span><h1>Submit a prediction</h1><p class="td-head-copy">Create a clear selection for admin review. Published tips become part of your public record.</p></div><span class="td-review-badge">REVIEW REQUIRED</span></div><form v-if="upcomingMatches.length" @submit.prevent="submitPrediction"><div class="td-form-section"><div class="td-section-label"><span>01</span><div><b>Match</b><small>Only upcoming scheduled fixtures can be selected.</small></div></div><div class="field"><label>Upcoming fixture</label><div class="match-picker" @keydown.esc="matchMenuOpen=false">
-  <button type="button" class="match-picker-trigger" :aria-expanded="matchMenuOpen" @click="matchMenuOpen=!matchMenuOpen">
-    <template v-if="selectedMatch">
-      <span class="match-picker-teams"><TeamLogo :src="selectedMatch.homeTeamId?.logo" :name="selectedMatch.homeTeamId?.name" size="sm"/><span><b>{{ selectedMatch.homeTeamId?.shortName||selectedMatch.homeTeamId?.name||'Home' }}</b><em>vs</em><b>{{ selectedMatch.awayTeamId?.shortName||selectedMatch.awayTeamId?.name||'Away' }}</b></span><TeamLogo :src="selectedMatch.awayTeamId?.logo" :name="selectedMatch.awayTeamId?.name" size="sm"/></span>
-      <span class="match-picker-meta">{{ selectedMatch.kickoff ? formatDateTime(selectedMatch.kickoff) : 'TBC' }}<i>⌄</i></span>
-    </template>
-    <template v-else><span class="match-picker-placeholder">Select an upcoming match</span><i>⌄</i></template>
-  </button>
-  <div v-if="matchMenuOpen" class="match-picker-menu">
-    <div class="match-picker-search"><input v-model="matchSearch" type="search" placeholder="Search team or league…" aria-label="Search upcoming matches" @click.stop /></div>
-    <button v-for="m in filteredMatches" :key="m._id" type="button" class="match-option" :class="{selected:String(form.matchId)===String(m._id)}" @click="chooseMatch(m)">
-      <div class="match-option-teams"><TeamLogo :src="m.homeTeamId?.logo" :name="m.homeTeamId?.name" size="sm"/><span><b>{{ m.homeTeamId?.shortName||m.homeTeamId?.name||'Home' }}</b><em>vs</em><b>{{ m.awayTeamId?.shortName||m.awayTeamId?.name||'Away' }}</b></span><TeamLogo :src="m.awayTeamId?.logo" :name="m.awayTeamId?.name" size="sm"/></div>
-      <div class="match-option-info"><strong>{{ m.leagueId?.name||m.league||'Football' }}</strong><small>{{ m.kickoff ? formatDateTime(m.kickoff) : 'TBC' }}</small></div>
-      <span v-if="String(form.matchId)===String(m._id)" class="match-selected">✓</span>
-    </button>
-    <div v-if="!filteredMatches.length" class="match-picker-empty">No upcoming matches found.</div>
-  </div>
-</div></div></div><div class="td-form-section"><div class="td-section-label"><span>02</span><div><b>Selection</b><small>Give members the exact market and price.</small></div></div><div class="td-fields-three"><div class="field"><label>Prediction</label><input v-model="form.prediction" required placeholder="Over 2.5 Goals"/></div><div class="field"><label>Odds</label><input v-model.number="form.odds" type="number" min="1" step=".01" required/></div><div class="field"><label>Confidence</label><select v-model.number="form.confidence"><option :value="90">90% — Very high</option><option :value="80">80% — High</option><option :value="70">70% — Good</option><option :value="60">60% — Moderate</option><option :value="50">50% — Balanced</option></select></div></div></div><div class="td-form-section"><div class="td-section-label"><span>03</span><div><b>Football reasoning</b><small>Explain the factors behind the selection.</small></div></div><div class="field"><label>Analysis</label><textarea v-model="form.analysis" maxlength="3000" placeholder="Form, injuries, home advantage, head-to-head trends, tactical matchup and other relevant evidence…"></textarea><div class="td-counter">{{ form.analysis.length }}/3000</div></div></div><div class="td-submit-foot"><div><b>Before you submit</b><span>Check the fixture, market, odds and reasoning. Your prediction will remain private until approved.</span></div><button class="btn" :disabled="submitting || !form.matchId">{{ submitting ? 'Submitting…' : 'Submit for review →' }}</button></div><div v-if="message" :class="messageType === 'success' ? 'success' : 'error'">{{ message }}</div></form><div v-else class="empty">There are no upcoming scheduled fixtures available right now. The prediction form is hidden until a future match is available.</div></section>
+  <section class="pro-panel td-submit">
+    <div class="pro-section-head">
+      <div>
+        <span class="eyebrow">Publishing desk</span>
+        <h1>Submit a prediction</h1>
+        <p class="td-head-copy">Create a clear selection for admin review. Published tips become part of your public record.</p>
+      </div>
+      <span class="td-review-badge">REVIEW REQUIRED</span>
+    </div>
+
+    <form @submit.prevent="submitPrediction">
+      <div class="td-form-section">
+        <div class="td-section-label">
+          <span>01</span>
+          <div><b>Match</b><small>Only upcoming scheduled fixtures can be selected.</small></div>
+        </div>
+
+        <div class="field">
+          <label>Upcoming fixture</label>
+          <div v-if="matchesLoading" class="match-picker-loading">Loading upcoming fixtures…</div>
+          <div v-else class="match-picker" @keydown.esc="matchMenuOpen = false">
+            <button
+              type="button"
+              class="match-picker-trigger"
+              :aria-expanded="matchMenuOpen"
+              aria-haspopup="listbox"
+              @click="matchMenuOpen = !matchMenuOpen"
+            >
+              <template v-if="selectedMatch">
+                <span class="match-picker-teams">
+                  <TeamLogo :src="selectedMatch.homeTeamId?.logo" :name="selectedMatch.homeTeamId?.name" size="sm" />
+                  <span>
+                    <b>{{ selectedMatch.homeTeamId?.shortName || selectedMatch.homeTeamId?.name || 'Home' }}</b>
+                    <em>vs</em>
+                    <b>{{ selectedMatch.awayTeamId?.shortName || selectedMatch.awayTeamId?.name || 'Away' }}</b>
+                  </span>
+                  <TeamLogo :src="selectedMatch.awayTeamId?.logo" :name="selectedMatch.awayTeamId?.name" size="sm" />
+                </span>
+                <span class="match-picker-meta">
+                  {{ selectedMatch.kickoff ? formatDateTime(selectedMatch.kickoff) : 'TBC' }}
+                  <i>⌄</i>
+                </span>
+              </template>
+              <template v-else>
+                <span class="match-picker-placeholder">Select an upcoming match</span>
+                <i>⌄</i>
+              </template>
+            </button>
+
+            <div v-if="matchMenuOpen" class="match-picker-menu" role="listbox">
+              <div class="match-picker-search">
+                <input
+                  v-model="matchSearch"
+                  type="search"
+                  placeholder="Search team or league…"
+                  aria-label="Search upcoming matches"
+                  @click.stop
+                />
+              </div>
+
+              <button
+                v-for="m in filteredMatches"
+                :key="m._id"
+                type="button"
+                class="match-option"
+                :class="{ selected: String(form.matchId) === String(m._id) }"
+                role="option"
+                :aria-selected="String(form.matchId) === String(m._id)"
+                @click="chooseMatch(m)"
+              >
+                <div class="match-option-teams">
+                  <TeamLogo :src="m.homeTeamId?.logo" :name="m.homeTeamId?.name" size="sm" />
+                  <span>
+                    <b>{{ m.homeTeamId?.shortName || m.homeTeamId?.name || 'Home' }}</b>
+                    <em>vs</em>
+                    <b>{{ m.awayTeamId?.shortName || m.awayTeamId?.name || 'Away' }}</b>
+                  </span>
+                  <TeamLogo :src="m.awayTeamId?.logo" :name="m.awayTeamId?.name" size="sm" />
+                </div>
+                <div class="match-option-info">
+                  <strong>{{ m.leagueId?.name || m.league || 'Football' }}</strong>
+                  <small>{{ m.kickoff ? formatDateTime(m.kickoff) : 'TBC' }}</small>
+                </div>
+                <span v-if="String(form.matchId) === String(m._id)" class="match-selected">✓</span>
+              </button>
+
+              <div v-if="!filteredMatches.length" class="match-picker-empty">No upcoming matches found.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="td-form-section">
+        <div class="td-section-label">
+          <span>02</span>
+          <div><b>Selection</b><small>Give members the exact market and price.</small></div>
+        </div>
+        <div class="td-fields-three">
+          <div class="field">
+            <label>Prediction</label>
+            <input v-model="form.prediction" required placeholder="Over 2.5 Goals" />
+          </div>
+          <div class="field">
+            <label>Odds</label>
+            <input v-model.number="form.odds" type="number" min="1" step=".01" required />
+          </div>
+          <div class="field">
+            <label>Confidence</label>
+            <select v-model.number="form.confidence">
+              <option :value="90">90% — Very high</option>
+              <option :value="80">80% — High</option>
+              <option :value="70">70% — Good</option>
+              <option :value="60">60% — Moderate</option>
+              <option :value="50">50% — Balanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="td-form-section">
+        <div class="td-section-label">
+          <span>03</span>
+          <div><b>Football reasoning</b><small>Explain the factors behind the selection.</small></div>
+        </div>
+        <div class="field">
+          <label>Analysis</label>
+          <textarea
+            v-model="form.analysis"
+            maxlength="3000"
+            placeholder="Form, injuries, home advantage, head-to-head trends, tactical matchup and other relevant evidence…"
+          ></textarea>
+          <div class="td-counter">{{ form.analysis.length }}/3000</div>
+        </div>
+      </div>
+
+      <div class="td-submit-foot">
+        <div>
+          <b>Before you submit</b>
+          <span>Check the fixture, market, odds and reasoning. Your prediction will remain private until approved.</span>
+        </div>
+        <button class="btn" :disabled="submitting || !form.matchId">
+          {{ submitting ? 'Submitting…' : 'Submit for review →' }}
+        </button>
+      </div>
+
+      <div v-if="message" :class="messageType === 'success' ? 'success' : 'error'">{{ message }}</div>
+    </form>
+  </section>
 </template>
+
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'; import { api } from '../services/api'; import { formatDateTime } from '../utils/formatters'; import TeamLogo from '../components/TeamLogo.vue';
-const upcomingMatches=ref<any[]>([]),submitting=ref(false),message=ref(''),messageType=ref('success'),matchMenuOpen=ref(false),matchSearch=ref('');const form=reactive<any>({matchId:'',fixture:'',league:'',prediction:'',odds:1.5,confidence:80,analysis:''});
-function matchLabel(m:any){const h=m?.homeTeamId?.shortName||m?.homeTeamId?.name||'Home',a=m?.awayTeamId?.shortName||m?.awayTeamId?.name||'Away';return `${h} vs ${a} · ${m?.kickoff?formatDateTime(m.kickoff):'TBC'}`}
-function selectMatch(){const m=upcomingMatches.value.find(x=>String(x._id)===String(form.matchId));if(m){form.fixture=`${m.homeTeamId?.name||'Home'} vs ${m.awayTeamId?.name||'Away'}`;form.league=m.leagueId?.name||''}}
-const selectedMatch=computed(()=>upcomingMatches.value.find(x=>String(x._id)===String(form.matchId))||null);const filteredMatches=computed(()=>{const q=matchSearch.value.trim().toLowerCase();if(!q)return upcomingMatches.value;return upcomingMatches.value.filter((m:any)=>[m.homeTeamId?.name,m.homeTeamId?.shortName,m.awayTeamId?.name,m.awayTeamId?.shortName,m.leagueId?.name,m.league].filter(Boolean).join(' ').toLowerCase().includes(q))});function chooseMatch(m:any){form.matchId=m._id;selectMatch();matchMenuOpen.value=false;matchSearch.value=''}
-async function load(){try{const m=await api.get('/matches?status=scheduled&limit=100');upcomingMatches.value=(m.data||[]).filter((x:any)=>new Date(x.kickoff).getTime()>Date.now())}catch{upcomingMatches.value=[]}}
-async function submitPrediction(){const m=upcomingMatches.value.find(x=>String(x._id)===String(form.matchId));if(!m||new Date(m.kickoff).getTime()<=Date.now()){message.value='This fixture is no longer upcoming. Please select another match.';messageType.value='error';await load();return}submitting.value=true;message.value='';try{const d=await api.post('/me/tipster/predictions',{matchId:form.matchId,prediction:form.prediction,odds:form.odds,confidence:form.confidence,analysis:form.analysis});message.value=d.message||'Prediction submitted for admin review.';messageType.value='success';Object.assign(form,{matchId:'',fixture:'',league:'',prediction:'',odds:1.5,confidence:80,analysis:''})}catch(e:any){message.value=e?.message||'Unable to submit prediction.';messageType.value='error'}finally{submitting.value=false}}
+import { computed, onMounted, reactive, ref } from 'vue'
+import { api } from '../services/api'
+import { formatDateTime } from '../utils/formatters'
+import TeamLogo from '../components/TeamLogo.vue'
+
+const upcomingMatches = ref<any[]>([])
+const submitting = ref(false)
+const matchesLoading = ref(true)
+const message = ref('')
+const messageType = ref<'success' | 'error'>('success')
+const matchMenuOpen = ref(false)
+const matchSearch = ref('')
+
+const form = reactive<any>({
+  matchId: '',
+  fixture: '',
+  league: '',
+  prediction: '',
+  odds: 1.5,
+  confidence: 80,
+  analysis: '',
+})
+
+const selectedMatch = computed(() =>
+  upcomingMatches.value.find((x) => String(x._id) === String(form.matchId)) || null,
+)
+
+const filteredMatches = computed(() => {
+  const q = matchSearch.value.trim().toLowerCase()
+  if (!q) return upcomingMatches.value
+
+  return upcomingMatches.value.filter((m: any) =>
+    [
+      m.homeTeamId?.name,
+      m.homeTeamId?.shortName,
+      m.awayTeamId?.name,
+      m.awayTeamId?.shortName,
+      m.leagueId?.name,
+      m.league,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(q),
+  )
+})
+
+function selectMatch() {
+  const m = upcomingMatches.value.find((x) => String(x._id) === String(form.matchId))
+  if (!m) return
+  form.fixture = `${m.homeTeamId?.name || 'Home'} vs ${m.awayTeamId?.name || 'Away'}`
+  form.league = m.leagueId?.name || m.league || ''
+}
+
+function chooseMatch(m: any) {
+  form.matchId = m._id
+  selectMatch()
+  matchMenuOpen.value = false
+  matchSearch.value = ''
+}
+
+function applyMatches(payload: any) {
+  upcomingMatches.value = (payload?.data || []).filter(
+    (x: any) => new Date(x.kickoff).getTime() > Date.now(),
+  )
+}
+
+async function load() {
+  matchesLoading.value = true
+  try {
+    const data = await api.getSWR<any>(
+      '/matches?status=scheduled&limit=100',
+      (fresh: any) => applyMatches(fresh),
+    )
+    applyMatches(data)
+  } catch {
+    upcomingMatches.value = []
+  } finally {
+    matchesLoading.value = false
+  }
+}
+
+async function submitPrediction() {
+  const m = upcomingMatches.value.find((x) => String(x._id) === String(form.matchId))
+
+  if (!m || new Date(m.kickoff).getTime() <= Date.now()) {
+    message.value = 'This fixture is no longer upcoming. Please select another match.'
+    messageType.value = 'error'
+    await load()
+    return
+  }
+
+  submitting.value = true
+  message.value = ''
+
+  try {
+    const d = await api.post('/me/tipster/predictions', {
+      matchId: form.matchId,
+      prediction: form.prediction,
+      odds: form.odds,
+      confidence: form.confidence,
+      analysis: form.analysis,
+    })
+
+    message.value = d.message || 'Prediction submitted for admin review.'
+    messageType.value = 'success'
+    Object.assign(form, {
+      matchId: '',
+      fixture: '',
+      league: '',
+      prediction: '',
+      odds: 1.5,
+      confidence: 80,
+      analysis: '',
+    })
+  } catch (e: any) {
+    message.value = e?.message || 'Unable to submit prediction.'
+    messageType.value = 'error'
+  } finally {
+    submitting.value = false
+  }
+}
+
 onMounted(load)
 </script>
