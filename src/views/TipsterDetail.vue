@@ -47,7 +47,8 @@ const {ask}=useConfirm();const {show:toast}=useToast();
 
 const route=useRoute(), router=useRouter(), auth=useAuth();
 const profile=ref<any>(null), picks=ref<any[]>([]), following=ref(false), loading=ref(true), error=ref('');
-const isOwnProfile=computed(()=>Boolean(auth.user?.id && profile.value?.userId && String(auth.user._id)===String(profile.value.userId)));
+const currentUserId=computed(()=>auth.user?._id || auth.user?.id || '');
+const isOwnProfile=computed(()=>Boolean(currentUserId.value && profile.value?.userId && String(currentUserId.value)===String(profile.value.userId)));
 const rate=computed(()=>profile.value?.totalTips ? Math.round(profile.value.wins/profile.value.totalTips*1000)/10 : 0);
 // Real recent-form strip (not an estimate): this tipster's actual last 8 settled
 // (won/lost) picks, oldest to newest left-to-right. `picks` already comes sorted
