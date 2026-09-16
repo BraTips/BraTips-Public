@@ -2,7 +2,7 @@
   <div class="pro-page tipster-dashboard page-animate">
     <div class="dashboard-shell">
       <aside class="dashboard-nav">
-        <div class="dashboard-brand-row"><div class="dashboard-brand-row"><div class="dashboard-brand">TIPSTER<br><b>WORKSPACE</b></div><NotificationBell /></div><NotificationBell /></div>
+        <div class="dashboard-brand-row"><div class="dashboard-brand-row"><div class="dashboard-brand">TIPSTER<br><b>WORKSPACE</b></div><NotificationBell /></div></div>
         <RouterLink v-for="item in nav" :key="item.to" :to="item.to" class="dashboard-nav-link">{{ item.label }}</RouterLink>
         <RouterLink to="/" class="dashboard-nav-link dashboard-back">← Back to site</RouterLink>
       </aside>
