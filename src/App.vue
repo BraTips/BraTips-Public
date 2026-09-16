@@ -8,14 +8,13 @@
 
         <nav class="desktop-nav" aria-label="Primary navigation" ref="desktopNavEl">
           <RouterLink to="/matches">Matches</RouterLink>
-          <RouterLink to="/predictions">Predictions</RouterLink>
-          <RouterLink to="/prediction-trends">Prediction Trends</RouterLink>
 
           <div class="nav-menu" :class="{open: openMenu==='tips'}">
             <button type="button" class="nav-menu-trigger" :aria-expanded="openMenu==='tips'" @click="toggleMenu('tips')">Tips <span>⌄</span></button>
             <transition name="dropdown">
               <div v-if="openMenu==='tips'" class="nav-dropdown" @click="closeMenu">
                 <RouterLink to="/picks">Latest Tips</RouterLink>
+                <RouterLink to="/predictions">All Predictions</RouterLink>
                 <RouterLink to="/bet-of-the-day">Bet of the Day</RouterLink>
                 <RouterLink to="/history">Tip History</RouterLink>
               </div>
@@ -33,11 +32,16 @@
             </transition>
           </div>
 
-          <div class="nav-menu" :class="{open: openMenu==='tools'}">
-            <button type="button" class="nav-menu-trigger" :aria-expanded="openMenu==='tools'" @click="toggleMenu('tools')">Tools <span>⌄</span></button>
+          <div class="nav-menu" :class="{open: openMenu==='research'}">
+            <button type="button" class="nav-menu-trigger" :aria-expanded="openMenu==='research'" @click="toggleMenu('research')">Research <span>⌄</span></button>
             <transition name="dropdown">
-              <div v-if="openMenu==='tools'" class="nav-dropdown" @click="closeMenu">
+              <div v-if="openMenu==='research'" class="nav-dropdown" @click="closeMenu">
+                <RouterLink to="/prediction-trends">Prediction Trends</RouterLink>
                 <RouterLink to="/dropping-odds">Dropping Odds</RouterLink>
+                <RouterLink to="/over-2-5-tips">Over 2.5 Tips</RouterLink>
+                <RouterLink to="/btts-tips">BTTS Tips</RouterLink>
+                <RouterLink to="/corners-tips">Corners</RouterLink>
+                <RouterLink to="/double-chance-tips">Double Chance</RouterLink>
                 <RouterLink to="/how-to-use">How to Use</RouterLink>
                 <RouterLink to="/faq">FAQ</RouterLink>
               </div>
@@ -49,7 +53,16 @@
 
         <div class="actions">
           <template v-if="auth.isLoggedIn">
-            <RouterLink to="/dashboard" class="avatar" :title="auth.user.name">{{auth.user.name?.[0]}}</RouterLink>
+            <div class="account-menu" :class="{open: accountOpen}">
+              <button type="button" class="avatar account-trigger" :title="auth.user.name" :aria-expanded="accountOpen" @click.stop="accountOpen=!accountOpen">{{auth.user.name?.[0]}}</button>
+              <div v-if="accountOpen" class="account-dropdown" @click="accountOpen=false">
+                <div class="account-dropdown-head"><b>{{auth.user.name}}</b><small>{{auth.isTipster ? 'Tipster account' : 'Member account'}}</small></div>
+                <RouterLink to="/dashboard">Dashboard</RouterLink>
+                <RouterLink to="/picks">Latest Picks</RouterLink>
+                <RouterLink to="/history">Prediction History</RouterLink>
+                <RouterLink v-if="auth.isTipster && auth.user?.username" :to="`/tipsters/${encodeURIComponent(auth.user.username)}`">Public Tipster Profile</RouterLink>
+              </div>
+            </div>
             <NotificationBell/>
             <button class="ghost nav-logout" @click="auth.logout">Log out</button>
           </template>
@@ -66,8 +79,8 @@
       <div v-if="mobileOpen" class="mobile-nav-panel">
         <div class="wrap mobile-nav-inner">
           <RouterLink to="/matches" @click="closeMobile">Matches</RouterLink>
-          <RouterLink to="/predictions" @click="closeMobile">Predictions</RouterLink>
           <RouterLink to="/picks" @click="closeMobile">Latest Tips</RouterLink>
+          <RouterLink to="/predictions" @click="closeMobile">All Predictions</RouterLink>
           <RouterLink to="/bet-of-the-day" @click="closeMobile">Bet of the Day</RouterLink>
           <RouterLink to="/tipsters" @click="closeMobile">Tipsters</RouterLink>
           <RouterLink to="/tipster-rankings" @click="closeMobile">Monthly Rankings</RouterLink>
@@ -108,6 +121,7 @@ import BrandedToast from './components/BrandedToast.vue';
 const auth=useAuth();
 const route=useRoute();
 const mobileOpen=ref(false);
+const accountOpen=ref(false);
 const closeMobile=()=>{mobileOpen.value=false};
 
 // Desktop "Tips / Tipsters / Tools" dropdowns.
@@ -125,6 +139,6 @@ function onKeydown(e:KeyboardEvent){ if(e.key==='Escape') closeMenu(); }
 onMounted(()=>{document.addEventListener('click', onDocClick); document.addEventListener('keydown', onKeydown)});
 onUnmounted(()=>{document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKeydown)});
 
-watch(()=>route.path, ()=>{closeMobile(); closeMenu();});
+watch(()=>route.path, ()=>{closeMobile(); closeMenu(); accountOpen.value=false;});
 const minimalChrome=computed(()=>['/login','/signup','/tipster-signup'].includes(route.path));
 </script>

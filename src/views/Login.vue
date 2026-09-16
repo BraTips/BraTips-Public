@@ -66,7 +66,7 @@ async function submit() {
   error.value = ''
   try {
     await auth.login(email.value, password.value)
-    router.push(String(route.query.redirect || '/dashboard'))
+    const redirect=String(route.query.redirect||''); const safeRedirect=redirect.startsWith('/')&&!redirect.startsWith('//')?redirect:''; router.push(safeRedirect||'/dashboard')
   } catch (e: any) {
     error.value = e?.message || 'Unable to sign in. Please check your details.'
   } finally {

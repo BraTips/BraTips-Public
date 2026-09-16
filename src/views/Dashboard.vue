@@ -24,6 +24,22 @@
         <div class="td-payout-note"><b>Payout timing</b><span>Withdrawals are processed manually within 1–3 business days after approval.</span></div><div v-if="withdrawMessage" :class="withdrawMessageType==='success'?'success':'error'" class="mt-3">{{ withdrawMessage }}</div>
       </section>
 
+      <section class="pro-panel td-published-picks">
+        <div class="pro-section-head">
+          <div><span class="eyebrow">Your published tips</span><h2>Tipster Picks</h2><p class="td-head-copy">Published selections are already live on BraTipsters. You do not need to submit the same pick again.</p></div>
+          <RouterLink v-if="tipster?.username" :to="`/tipsters/${encodeURIComponent(tipster.username)}`" class="ghost">View public profile →</RouterLink>
+        </div>
+        <div v-if="publishedTipsterPicks.length" class="td-published-list">
+          <RouterLink v-for="p in publishedTipsterPicks.slice(0,6)" :key="p._id" :to="p.matchId?`/matches/${p.matchId}`:`/predictions/${p._id}`" class="td-published-row">
+            <div><b>{{p.fixture || 'Football match'}}</b><small>{{formatDate(p.publishedAt || p.createdAt)}}</small></div>
+            <span>{{p.prediction}}</span>
+            <strong>{{Number(p.odds||0).toFixed(2)}}</strong>
+            <em :class="'td-status-pill '+p.status">{{statusLabel(p.status)}}</em>
+          </RouterLink>
+        </div>
+        <div v-else class="empty">Once an approved prediction is published, it will appear here as your live Tipster Pick.</div>
+      </section>
+
       <section class="td-kpis">
         <div class="td-kpi"><span>Total tips</span><b>{{ tipster?.totalTips || 0 }}</b><small>published selections</small><strong>↗</strong></div>
         <div class="td-kpi"><span>Win rate</span><b>{{ winRate }}%</b><small>{{ tipster?.wins || 0 }} wins · {{ tipster?.losses || 0 }} losses</small><strong>◎</strong></div>
@@ -66,7 +82,8 @@
 import {computed,onMounted,reactive,ref} from 'vue';import {RouterLink} from 'vue-router';import {useAuth} from '../stores/auth';import {api} from '../services/api';import {useConfirm,useToast} from '../composables/feedback';
 import {formatDate,formatDateTime,formatMoney,formatOdds,formatPercent,formatProfit} from '../utils/formatters';import EmptyState from '../components/EmptyState.vue';import BrandedLoader from '../components/BrandedLoader.vue';
 const auth=useAuth();const {ask}=useConfirm();const {show:toast}=useToast();
-const picks=ref<any[]>([]),notifications=ref<any[]>([]),unread=ref(0),tipster=ref<any>(null),predictions=ref<any[]>([]),upcomingMatches=ref<any[]>([]),wallet=ref<any>(null),message=ref(''),messageType=ref('success'),submitting=ref(false),withdrawSubmitting=ref(false),withdrawMessage=ref(''),withdrawMessageType=ref('success'),withdrawMethod=ref<'mobile_money'|'bank_transfer'>('mobile_money');const payout=reactive({accountName:'',accountNumber:'',institution:''});const form=reactive<any>({matchId:'',fixture:'',league:'',prediction:'',odds:1.5,confidence:80,analysis:''});const openPicks=computed(()=>picks.value.filter(x=>x.status==='open').length),wonPicks=computed(()=>picks.value.filter(x=>x.status==='won').length),pendingCount=computed(()=>predictions.value.filter(x=>['pending','under_review'].includes(x.status)).length),winRate=computed(()=>{const w=Number(tipster.value?.wins||0),l=Number(tipster.value?.losses||0);return w+l?Math.round(w/(w+l)*100):0});
+const picks=ref<any[]>([]),notifications=ref<any[]>([]),unread=ref(0),tipster=ref<any>(null),predictions=ref<any[]>([]),upcomingMatches=ref<any[]>([]),wallet=ref<any>(null),message=ref(''),messageType=ref('success'),submitting=ref(false),withdrawSubmitting=ref(false),withdrawMessage=ref(''),withdrawMessageType=ref('success'),withdrawMethod=ref<'mobile_money'|'bank_transfer'>('mobile_money');const payout=reactive({accountName:'',accountNumber:'',institution:''});const form=reactive<any>({matchId:'',fixture:'',league:'',prediction:'',odds:1.5,confidence:80,analysis:''});const publishedTipsterPicks=computed(()=>predictions.value.filter(x=>['published','won','lost','void'].includes(x.status)));
+const openPicks=computed(()=>picks.value.filter(x=>x.status==='open').length),wonPicks=computed(()=>picks.value.filter(x=>x.status==='won').length),pendingCount=computed(()=>predictions.value.filter(x=>['pending','under_review'].includes(x.status)).length),winRate=computed(()=>{const w=Number(tipster.value?.wins||0),l=Number(tipster.value?.losses||0);return w+l?Math.round(w/(w+l)*100):0});
 function initials(v:string){return v.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'T'}function statusLabel(v:string){return v==='published'?'Published':v==='won'?'Won':v==='lost'?'Lost':v==='void'?'Void':'Pending'}function formatPercentValue(v:any){return formatPercent(v)}function focusSubmit(){document.getElementById('submit-prediction')?.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>document.querySelector<HTMLInputElement>('#submit-prediction input')?.focus(),350)}
 async function load(){const failures:string[]=[];try{const n=await api.get('/me/notifications');notifications.value=n.data||[];unread.value=n.unread||0}catch{failures.push('notifications')}try{picks.value=(await api.get('/me/picks')).data||[]}catch{failures.push('My Picks')}if(auth.isTipster)try{const m=await api.get('/matches?status=scheduled&limit=100');upcomingMatches.value=(m.data||[]).filter((x:any)=>new Date(x.kickoff).getTime()>Date.now());if(form.matchId && !upcomingMatches.value.some((x:any)=>String(x._id)===String(form.matchId)))Object.assign(form,{matchId:'',fixture:'',league:''})}catch{upcomingMatches.value=[];failures.push('upcoming fixtures')}if(auth.isTipster)try{const d=await api.get('/me/tipster');tipster.value=d.data.profile;predictions.value=d.data.predictions||[]}catch{failures.push('tipster profile')}if(auth.isTipster)try{wallet.value=(await api.get('/me/tipster/wallet')).data}catch{failures.push('tipster wallet')}if(failures.length)toast(`Some dashboard data could not be loaded: ${failures.join(', ')}.`, 'error', 'Dashboard update') }
 function matchLabel(m:any){const h=m?.homeTeamId?.shortName||m?.homeTeamId?.name||'Home',a=m?.awayTeamId?.shortName||m?.awayTeamId?.name||'Away',dt=m?.kickoff?formatDateTime(m.kickoff):'TBC';return `${h} vs ${a} · ${dt}`}
