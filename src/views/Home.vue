@@ -65,7 +65,12 @@
           <div v-else class="empty-state">No upcoming tipster predictions have been published yet.</div>
         </section>
 
-        <section class="feature-feed">
+        <section class="home-panel bot-home-panel">
+          <div class="panel-head">
+            <div><span class="eyebrow">Daily feature</span><h2>Bet of the Day</h2><p class="panel-subcopy">Today's highlighted selection from BraTipsters, with the market, odds and fixture clearly shown.</p></div>
+            <RouterLink to="/bet-of-the-day" class="text-link">View Bet of the Day →</RouterLink>
+          </div>
+          <div class="feature-feed">
           <template v-if="loading.bot">
             <div class="feature-row skeleton-row" v-for="i in 3" :key="'sk-'+i">
               <div class="skel skel-time"></div><div class="skel skel-teams"></div><div class="skel skel-pick"></div>
@@ -91,6 +96,7 @@
             </RouterLink>
             <div v-if="!bot.length" class="empty-state">No Bet of the Day picks have been published yet.</div>
           </template>
+          </div>
         </section>
 
         <section class="home-panel weekly-predictions-panel">
