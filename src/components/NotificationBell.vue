@@ -1,7 +1,7 @@
 <template>
   <div v-if="auth.isLoggedIn" ref="notificationRoot" class="notif-wrap">
     <button class="notification notification-trigger" type="button" :aria-expanded="open" aria-label="Notifications" title="Notifications" @click.stop="open = !open">
-      <span class="notification-glyph" aria-hidden="true"></span><span v-if="unread" class="notif-count">{{ unread > 9 ? '9+' : unread }}</span>
+      <svg class="notification-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span v-if="unread" class="notif-count">{{ unread > 9 ? '9+' : unread }}</span>
     </button>
     <Transition name="notification-popover">
       <div v-if="open" class="notif-pop" role="dialog" aria-label="Notifications" @click.stop>

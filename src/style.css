@@ -791,3 +791,52 @@ html[data-theme="dark"] .premium-badge,html[data-theme="dark"] .premium-lock,htm
 /* Keep premium surfaces plain; the pink badge is the single premium marker. */
 .weekly-pick.weekly-pick-locked b{color:#17243b}.weekly-pick.weekly-pick-locked strong{display:none}.football-match-card .pmc-locked{display:grid;gap:3px}.premium-research,.premium-callout{background:#fff!important;color:#17243b!important;border:1px solid #e0e5ec!important;box-shadow:0 8px 30px rgba(16,24,40,.06)!important}.premium-research p,.premium-callout p{color:#7b8799!important}.premium-callout a{color:#df005b!important}
 html[data-theme="dark"] .premium-research,html[data-theme="dark"] .premium-callout{background:#151b26!important;color:#f2f4f7!important;border-color:#293241!important}html[data-theme="dark"] .premium-research p,html[data-theme="dark"] .premium-callout p{color:#98a2b3!important}
+
+/* Mobile stability, professional controls and centered submit spinners */
+html,body,#app{max-width:100%;overflow-x:hidden}
+.btn,.ghost,.pillbtn{background:var(--pink);color:#fff}
+.btn:hover,.ghost:hover,.pillbtn:hover{background:#d91f54;color:#fff}
+.notification-glyph{width:20px;height:20px;display:block;transform:none;overflow:visible}
+.notification-glyph path{vector-effect:non-scaling-stroke}
+.notification-trigger{width:42px;height:42px;border-radius:12px;background:#fff;color:#26344c;box-shadow:0 2px 8px rgba(16,26,46,.06)}
+.notification-trigger:hover,.notification-trigger[aria-expanded="true"]{background:#fff0f4;border-color:#f2b2c5;color:var(--pink)}
+.bt-inline-loader{display:inline-flex!important;width:100%;min-width:0;align-items:center;justify-content:center;gap:0;line-height:1}
+.bt-inline-loader i{width:18px;height:18px;border:2px solid rgba(255,255,255,.38);border-top-color:#fff;border-radius:50%;display:block;animation:bt-spin .72s linear infinite}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@keyframes bt-spin{to{transform:rotate(360deg)}}
+@media(max-width:850px){
+  .top{height:72px}
+  .brand{flex:0 0 auto;min-width:0}
+  .brand img{width:182px;height:36px;object-fit:contain;display:block}
+  .nav{gap:10px;padding-left:16px;padding-right:12px}
+  .actions{gap:7px;min-width:0}
+  .auth-panel{padding:28px 16px;min-width:0;width:100%;}
+  .auth-form-shell,.auth-register-shell{width:100%;max-width:460px;min-width:0}
+  .auth-mobile-brand img{width:200px;height:40px;object-fit:contain}
+  .auth-input-wrap{width:100%;min-width:0;padding:0 11px}
+  .auth-input-wrap input{min-width:0;flex:1;width:0}
+  .tipster-apply-body{padding-left:0;padding-right:0}
+  .tipster-apply-card{min-width:0;width:100%;padding:18px}
+  .tipster-fields.two{grid-template-columns:minmax(0,1fr)}
+  .tipster-apply-grid{min-width:0}
+  .tipster-apply-hero{padding:32px 0}
+  .tipster-apply-hero h1{font-size:34px;overflow-wrap:anywhere}
+  .tipster-hero-status{width:100%;min-width:0}
+  .tipster-apply-side{grid-template-columns:1fr}
+  .tipster-form-head{min-width:0}
+  .tipster-form-head>div{min-width:0}
+  .plain-input,.tipster-apply-card .auth-field textarea{max-width:100%;min-width:0}
+}
+@media(max-width:520px){
+  .brand img{width:174px;height:35px}
+  .auth-mobile-brand img{width:205px;height:41px}
+  .auth-heading h2{font-size:30px}
+  .auth-showcase-copy h1{font-size:38px}
+  .tipster-apply-card{padding:15px;border-radius:13px}
+  .tipster-apply-hero h1{font-size:30px}
+  .tipster-form-head{gap:10px}
+  .tipster-form-badge{display:none}
+  .auth-input-wrap{height:50px}
+  .auth-input-wrap input{font-size:16px;min-width:0}
+  .field input,.field textarea,.field select,.toolbar input,.toolbar select{max-width:100%;min-width:0}
+}

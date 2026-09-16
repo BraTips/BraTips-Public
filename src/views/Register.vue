@@ -39,7 +39,7 @@
             <label for="signup-password">Password</label>
             <div class="auth-input-wrap"><span>●</span><input id="signup-password" v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="Create a secure password" minlength="8" required /><button type="button" class="password-toggle" :aria-label="showPassword ? 'Hide password' : 'Show password'" :title="showPassword ? 'Hide password' : 'Show password'" @click="showPassword = !showPassword">◉</button></div>
           </div>
-          <button class="auth-submit" type="submit" :disabled="busy"><span>{{ busy ? 'Creating account…' : 'Create member account' }}</span><b>→</b></button>
+          <button class="auth-submit" type="submit" :disabled="busy"><BrandedLoader v-if="busy" label="Creating account"/><template v-else><span>Create member account</span><b>→</b></template></button>
         </form>
 
         <div class="auth-divider"><span>ALREADY A MEMBER?</span></div>
@@ -62,6 +62,7 @@
 import { ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useAuth } from '../stores/auth'
+import BrandedLoader from '../components/BrandedLoader.vue'
 
 const auth = useAuth()
 const route = useRoute()

@@ -67,7 +67,7 @@
               <div class="auth-field"><label for="sample-analysis">Analysis</label><textarea id="sample-analysis" v-model="f.samplePrediction.analysis" minlength="20" placeholder="Explain the form, matchup, trends or other factors behind your pick…" required></textarea></div>
             </div>
 
-            <button class="auth-submit tipster-submit" type="submit" :disabled="busy"><span>{{ busy ? 'Submitting application…' : 'Submit for review' }}</span><b>→</b></button>
+            <button class="auth-submit tipster-submit" type="submit" :disabled="busy"><BrandedLoader v-if="busy" label="Submitting application"/><template v-else><span>Submit for review</span><b>→</b></template></button>
             <p class="tipster-form-foot">Applications are reviewed before a tipster profile can publish picks.</p>
           </template>
         </form>
@@ -80,6 +80,7 @@
 import { reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuth } from '../stores/auth'
+import BrandedLoader from '../components/BrandedLoader.vue'
 
 const auth = useAuth()
 const error = ref('')
