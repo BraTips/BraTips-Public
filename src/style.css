@@ -754,7 +754,8 @@ h1,h2,h3,h4,h5,h6,button,input,select,textarea{font-family:inherit}
 .plans-grid-new{grid-template-columns:repeat(4,minmax(0,1fr))}.plans-grid-new .subscription-plan{min-width:0}.plans-grid-new .plan-description{min-height:58px}.plans-grid-new .plan-actions{grid-template-columns:1fr}.plans-grid-new .plan-actions .btn{width:100%;padding-left:10px;padding-right:10px}
 @media(max-width:1100px){.plans-grid-new{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.plans-grid-new{grid-template-columns:1fr}}
-.bot-grid{align-items:start}.bot-pro-card{padding:14px}.bot-fixture{margin:13px 0;gap:7px}.bot-pro-card .team-logo.lg{width:58px;height:58px;font-size:13px}.bot-selection{padding:10px 0}.bot-selection strong{font-size:18px;line-height:1.25}.bot-card-stats{margin:10px 0}.bot-card-stats div{padding:6px}.bot-pro-card>p{min-height:0;margin:10px 0 8px}.bot-open{display:block}
+.bot-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}.bot-pro-card{padding:14px}.bot-fixture{margin:13px 0;gap:7px}.bot-pro-card .team-logo.lg{width:58px;height:58px;font-size:13px}.bot-selection{padding:10px 0}.bot-selection strong{font-size:18px;line-height:1.25}.bot-card-stats{margin:10px 0}.bot-card-stats div{padding:6px}.bot-pro-card>p{min-height:0;margin:10px 0 8px}.bot-open{display:block}
+@media(max-width:900px){.bot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.bot-pro-card{padding:12px}.bot-fixture{margin:11px 0}.bot-pro-card .team-logo.lg{width:48px;height:48px;font-size:11px}.bot-fixture b{font-size:12px!important}.bot-fixture>span{font-size:11px!important}.bot-selection small,.bot-selection span{font-size:11px!important}.bot-selection strong{font-size:16px}.bot-card-stats span{font-size:10px!important}.bot-card-stats b{font-size:12px!important}.bot-pro-card>p{font-size:11px!important}}
 
 /* Restored functionality compatibility layer: retained from the previous working Tipster UI. */
