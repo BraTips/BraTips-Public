@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page">
+  <div class="auth-page auth-register-page">
     <section class="auth-showcase auth-showcase-register">
       <div class="auth-showcase-inner">
         <RouterLink to="/" class="auth-brand"><img src="/logo-auth.svg" alt="BraTipsters" /></RouterLink>
