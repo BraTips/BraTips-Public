@@ -57,7 +57,7 @@
               <button type="button" class="avatar account-trigger" :title="auth.user.name" :aria-expanded="accountOpen" @click.stop="accountOpen=!accountOpen">{{auth.user.name?.[0]}}</button>
               <div v-if="accountOpen" class="account-dropdown" @click="accountOpen=false">
                 <div class="account-dropdown-head"><b>{{auth.user.name}}</b><small>{{auth.isTipster ? 'Tipster account' : 'Member account'}}</small></div>
-                <RouterLink to="/dashboard">Dashboard</RouterLink>
+                <RouterLink :to="auth.isTipster ? '/tipster-dashboard' : '/dashboard'">{{ auth.isTipster ? 'Tipster Dashboard' : 'Dashboard' }}</RouterLink>
                 <RouterLink to="/picks">Latest Picks</RouterLink>
                 <RouterLink to="/history">Prediction History</RouterLink>
                 <RouterLink v-if="auth.isTipster && auth.user?.username" :to="`/tipsters/${encodeURIComponent(auth.user.username)}`">Public Tipster Profile</RouterLink>
