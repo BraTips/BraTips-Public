@@ -24,7 +24,7 @@
 
         <section class="trend-main-grid">
           <article class="trend-panel chart-panel">
-            <div class="trend-panel-head"><div><h2>Profit & Win Rate Trend</h2><p>Daily settled performance</p></div><div class="legend"><span><i class="dot profit-dot"></i> Profit/Loss</span><span><i class="dot rate-dot"></i> Win Rate</span></div></div>
+            <div class="trend-panel-head"><div><h2>{{ trendTitle }}</h2><p>{{ trendDescription }}</p></div><div class="legend"><span><i class="dot profit-dot"></i> Profit/Loss</span><span><i class="dot rate-dot"></i> Win Rate</span></div></div>
             <div class="chart-wrap" v-if="daily.length">
               <div class="y-axis"><span>{{ formatMoney(chartMax,true) }}</span><span>{{ formatMoney(chartMax/2,true) }}</span><span>{{ formatMoney(0,true) }}</span><span>{{ formatMoney(chartMin/2,true) }}</span><span>{{ formatMoney(chartMin,true) }}</span></div>
               <svg viewBox="0 0 760 280" preserveAspectRatio="none" class="trend-chart">
@@ -38,7 +38,7 @@
               </svg>
               <div class="x-axis"><span v-for="d in chartLabels" :key="d.date">{{ shortDate(d.date) }}</span></div>
             </div>
-            <EmptyState v-else title="No settled data yet" message="There are no settled prediction results in the selected period. Trends will appear automatically as tips are settled." icon="↗" />
+            <EmptyState v-else title="No prediction activity yet" message="There are no predictions recorded in the selected period." icon="↗" />
           </article>
 
           <article class="trend-panel market-distribution">
@@ -77,10 +77,12 @@ import EmptyState from '../components/EmptyState.vue';
 import BaseCard from '../components/BaseCard.vue';
 const days=ref(365),loading=ref(true),error=ref('');
 const summary=ref<any>({tips:0,wins:0,winRate:0,profit:0,avgOdds:0});
-const markets=ref<any[]>([]),distribution=ref<any[]>([]),daily=ref<any[]>([]);
+const markets=ref<any[]>([]),distribution=ref<any[]>([]),daily=ref<any[]>([]),mode=ref<'settled'|'activity'>('settled');
+const trendTitle=computed(()=>mode.value==='activity'?'Prediction Activity Trend':'Profit & Win Rate Trend');
+const trendDescription=computed(()=>mode.value==='activity'?'Daily predictions submitted in the selected period.':'Daily settled performance');
 const palette=['#ed275f','#7757e8','#2397ee','#18c99a','#ffbd62','#9da8bb'];
 function fmt(n:number){return formatNumber(n)} function pct(n:number){return Number(n||0).toFixed(1)} function shortDate(v:string){return formatShortDate(v)}
-async function load(){loading.value=true;error.value='';try{const r=await api.get(`/prediction-trends?days=${days.value}`);const d=r.data||{};summary.value=d.summary||summary.value;markets.value=d.markets||[];distribution.value=d.distribution||[];daily.value=d.daily||[];}catch(e:any){error.value=e?.message||'Unable to load prediction trends.'}finally{loading.value=false}}
+async function load(){loading.value=true;error.value='';try{const r=await api.get(`/prediction-trends?days=${days.value}`);const d=r.data||{};summary.value=d.summary||summary.value;markets.value=d.markets||[];distribution.value=d.distribution||[];daily.value=d.daily||[];mode.value=d.mode||'settled';}catch(e:any){error.value=e?.message||'Unable to load prediction trends.'}finally{loading.value=false}}
 const chartMax=computed(()=>Math.max(100,...daily.value.map(d=>Math.abs(Number(d.profit||0)))));const chartMin=computed(()=>-chartMax.value);
 const barWidth=12; function pointX(i:number){return daily.value.length<2?380:(i/(daily.value.length-1))*740+10} function rateY(v:number){return 250-(Math.min(100,Math.max(0,v))/100)*220} function barX(i:number){return pointX(i)-barWidth/2} function barY(v:number){const zero=140, scale=110/chartMax.value;return v>=0?zero-v*scale:zero} function barHeight(v:number){return Math.max(2,Math.abs(v)*110/chartMax.value)}
 const ratePoints=computed(()=>daily.value.map((d,i)=>`${pointX(i)},${rateY(Number(d.winRate||0))}`).join(' '));
