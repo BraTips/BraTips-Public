@@ -44,7 +44,7 @@
             <div class="weekly-prediction-row skeleton-row" v-for="i in 4" :key="'sktp-'+i"><div class="skel skel-time"></div><div class="skel skel-teams"></div><div class="skel skel-pick"></div></div>
           </div>
           <div v-else-if="tipsterPredictions.length" class="weekly-prediction-list">
-            <RouterLink v-for="p in tipsterPredictions" :key="p._id" :to="p.matchId ? { path: `/matches/${p.matchId._id||p.matchId}`, query: { prediction: p._id } } : `/predictions/${p._id}`" class="weekly-prediction-row">
+            <RouterLink v-for="p in tipsterPredictions" :key="p._id" :to="`/predictions/${p._id}`" class="weekly-prediction-row">
               <div class="weekly-date"><b>{{ predictionDate(p) }}</b><small>{{ predictionTime(p) }}</small></div>
               <div class="weekly-fixture">
                 <div><TeamLogo :src="predictionHomeLogo(p)" :name="predictionHomeName(p)" size="sm"/><b>{{ predictionHomeName(p) }}</b></div>
