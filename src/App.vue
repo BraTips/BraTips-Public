@@ -94,6 +94,8 @@
           <RouterLink to="/how-to-use" @click="closeMobile">How to Use</RouterLink>
           <RouterLink to="/faq" @click="closeMobile">FAQ</RouterLink>
           <RouterLink to="/premium-features" class="mobile-premium" @click="closeMobile">Premium</RouterLink>
+          <RouterLink v-if="!auth.isLoggedIn" to="/login" class="mobile-auth-link" @click="closeMobile">Log in</RouterLink>
+          <RouterLink v-if="!auth.isLoggedIn" to="/signup" class="mobile-auth-link mobile-auth-primary" @click="closeMobile">Sign up</RouterLink>
           <RouterLink v-if="!auth.isLoggedIn" to="/tipster-signup" @click="closeMobile">Become a Tipster</RouterLink>
         </div>
       </div>
