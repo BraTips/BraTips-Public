@@ -841,12 +841,11 @@ html,body,#app{max-width:100%;overflow-x:hidden}
   .field input,.field textarea,.field select,.toolbar input,.toolbar select{max-width:100%;min-width:0}
 }
 
-/* Homepage three-column workspace: keep the navigation and tipster rail stable while the center feed can scroll. */
+/* Homepage three-column workspace: keep the tipster predictions list to a manageable
+   height with its own internal scroll, without clipping the whole shell to viewport
+   height (that previously made the "Get more from BraTipsters" section below it overlap
+   the sidebar/feed cards once the page was scrolled). */
 @media (min-width: 1051px){
-  .pro-home .home-shell{height:calc(100vh - 102px);min-height:520px;align-items:stretch}
-  .pro-home .home-sidebar,
-  .pro-home .home-right{position:sticky;top:0;align-self:start}
-  .pro-home .home-main{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 6px 30px 0;scrollbar-gutter:stable}
   .pro-home .weekly-predictions-panel{overflow:hidden}
   .pro-home .weekly-predictions-panel .weekly-prediction-list{max-height:430px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
   .pro-home .weekly-predictions-panel .weekly-more{position:sticky;bottom:0}
@@ -856,7 +855,6 @@ html,body,#app{max-width:100%;overflow-x:hidden}
   .pro-home .weekly-predictions-panel .weekly-prediction-list{max-height:430px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 }
 @media (max-width:760px){
-  .pro-home .home-shell{height:auto;min-height:0}
-  .pro-home .home-main{height:auto;overflow:visible;padding-right:0}
   .pro-home .weekly-predictions-panel .weekly-prediction-list{max-height:520px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 }
+
