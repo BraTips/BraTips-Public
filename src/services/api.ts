@@ -54,12 +54,14 @@ async function request(path:string, options:RequestInit={}, cache=true){
   const headers=new Headers(options.headers);headers.set('Content-Type','application/json');
   if(accessToken)headers.set('Authorization',`Bearer ${accessToken}`);
   try{
-    let r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});
+    const fetchOptions:RequestInit={...options,headers,credentials:'include'};
+    if(isGet && !ttl) fetchOptions.cache='no-store';
+    let r=await fetchWithTimeout(`${API}${path}`,fetchOptions);
     if(r.status===401&&path!='/auth/refresh'){
       try{
         if(!refreshPromise){refreshPromise=(async()=>{try{const rr=await fetchWithTimeout(`${API}/auth/refresh`,{method:'POST',credentials:'include'});if(!rr.ok)return null;const d=await rr.json();if(!d?.accessToken)return null;setToken(d.accessToken);return d.accessToken as string}catch{return null}finally{refreshPromise=null}})();}
         const freshToken=await refreshPromise;
-        if(freshToken){headers.set('Authorization',`Bearer ${freshToken}`);r=await fetchWithTimeout(`${API}${path}`,{...options,headers,credentials:'include'});}else {setToken('');window.dispatchEvent(new CustomEvent('bratips:session-expired'));}
+        if(freshToken){headers.set('Authorization',`Bearer ${freshToken}`);r=await fetchWithTimeout(`${API}${path}`,fetchOptions);}else {setToken('');window.dispatchEvent(new CustomEvent('bratips:session-expired'));}
       }catch{}
     }
     const d=await r.json().catch(()=>({}));

@@ -126,6 +126,15 @@ const liveWithPredictions=computed(()=>matches.value.filter(m=>m.status==='live'
 const visibleMatches=computed(()=>matches.value);
 const filteredMatches=computed(()=>matches.value.filter(m=>leagueFilter.value==='all'||m.leagueId?.name===leagueFilter.value).filter(m=>marketFilter.value==='all'||predictionFor(m._id)?.prediction===marketFilter.value));
 function startPolling(){if(refreshTimer)window.clearInterval(refreshTimer);const ms=tab.value==='live'?15000:tab.value==='today'?60000:300000;refreshTimer=window.setInterval(load,ms)}
-async function load(){const key=tab.value;const cached=matchCache.get(key);if(cached){matches.value=cached}loading.value=!cached;error.value='';try{const endpoint=key==='today'?'/matches/today':key==='live'?'/matches/live':`/matches?status=${key}&limit=100`;const [d,p]=await Promise.all([api.get(endpoint),predictionsLoaded?Promise.resolve(null):api.get('/predictions?limit=100')]);const next=d.data||[];matchCache.set(key,next);matches.value=next;if(p){predictions.value=(p.data||[]).filter((x:any)=>x.systemGenerated||!x.tipsterId);predictionsLoaded=true}if(key==='live')lastLiveUpdate.value=new Date().toISOString()}catch(e:any){if(!matches.value.length)error.value=e?.message||'Unable to load football matches.'}finally{loading.value=false}}
+function normalizedStatus(m:any){
+  const raw=String(m?.status||'scheduled').toLowerCase();
+  const detail=String(m?.state||m?.stateName||m?.shortStatus||m?.statusDescription||m?.time?.status||m?.period||'').toLowerCase();
+  if(raw==='finished'||raw==='ft'||raw==='fulltime'||detail==='ft'||detail.includes('finished')||detail.includes('full time')) return 'finished';
+  if(raw==='live'||raw==='inplay'||raw==='in_play') return 'live';
+  if(raw==='scheduled'||raw==='upcoming'||raw==='not_started') return 'scheduled';
+  return raw||'scheduled';
+}
+function normalizeMatch(m:any){return {...m,status:normalizedStatus(m)}}
+async function load(){const key=tab.value;const useComponentCache=key!=='live';const cached=useComponentCache?matchCache.get(key):undefined;if(cached){matches.value=cached}loading.value=!cached;error.value='';try{const endpoint=key==='today'?'/matches/today':key==='live'?`/matches/live?_=${Date.now()}`:`/matches?status=${key}&limit=100`;const [d,p]=await Promise.all([api.get(endpoint),predictionsLoaded?Promise.resolve(null):api.get('/predictions?limit=100')]);const next=(d.data||[]).map(normalizeMatch).filter((m:any)=>key!=='live'||m.status==='live');if(useComponentCache)matchCache.set(key,next);else matchCache.delete(key);matches.value=next;if(p){predictions.value=(p.data||[]).filter((x:any)=>x.systemGenerated||!x.tipsterId);predictionsLoaded=true}if(key==='live')lastLiveUpdate.value=new Date().toISOString()}catch(e:any){if(!matches.value.length)error.value=e?.message||'Unable to load football matches.'}finally{loading.value=false}}
 watch(tab,()=>{leagueFilter.value='all';marketFilter.value='all';load();startPolling()});onMounted(()=>{load();startPolling()});onUnmounted(()=>{if(refreshTimer)window.clearInterval(refreshTimer)});
 </script>
