@@ -25,6 +25,7 @@ const nav = [
   { label: 'Analytics', to: '/tipster-dashboard/analytics' },
   { label: 'Earnings & Revenue', to: '/tipster-dashboard/earnings' },
   { label: 'Withdrawals', to: '/tipster-dashboard/withdrawals' },
+  { label: 'Reports & Support', to: '/tipster-dashboard/reports' },
   { label: 'Premium', to: '/tipster-dashboard/premium' },
   { label: 'Public Profile', to: '/tipster-dashboard/profile' },
   { label: 'Profile Settings', to: '/tipster-dashboard/settings' },
