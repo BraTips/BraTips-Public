@@ -28,4 +28,16 @@ async function save(){busy.value=true;error.value='';try{const ok=await ask({tit
 </script>
 <style scoped>
 .premium-lock{color:#8b4cf6}.locked-prediction{color:#17243b;font-weight:900;padding:8px 0}.locked-bottom{justify-content:flex-end}.tip-status{display:flex;align-items:center;gap:5px}.fixture-teams{display:flex;align-items:center;justify-content:center;gap:10px;margin:15px 0;font-size:13px}.fixture-teams>div{display:flex;align-items:center;gap:6px;min-width:0}.fixture-teams>div b{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fixture-teams span{color:var(--muted);font-size:11px}.feed-score{font-weight:900;color:#17243b!important;white-space:nowrap}.play-box{margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}.play-box input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;margin:8px 0}
+@media(max-width:640px){
+  .tip-top{align-items:flex-start;gap:8px;flex-wrap:wrap}
+  .tip-status{min-width:0;flex-wrap:wrap;justify-content:flex-end}
+  .fixture-teams{display:grid;grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);gap:6px;margin:13px 0}
+  .fixture-teams>div{justify-content:center;text-align:center}
+  .fixture-teams>div b{max-width:100%;font-size:12px;line-height:1.25}
+  .prediction{font-size:20px;line-height:1.2;overflow-wrap:anywhere}
+  .tip-bottom{align-items:stretch;gap:10px;flex-direction:column}
+  .tip-bottom .btn,.tip-bottom .ghost{width:100%;text-align:center}
+  .play-box div[style]{flex-wrap:wrap}
+  .play-box .btn,.play-box .ghost{flex:1 1 120px}
+}
 </style>
