@@ -933,6 +933,27 @@ html,body,#app{max-width:100%;overflow-x:hidden}
   .pro-home .home-explore-card{min-width:0}
 }
 
+/* Homepage feed rows: keep odds and arrow controls visible in the center column. */
+.pro-home .feature-feed,
+.pro-home .weekly-prediction-list{width:100%;max-width:100%;overflow-x:hidden}
+.pro-home .feature-row{width:100%;min-width:0;box-sizing:border-box;grid-template-columns:minmax(72px,.5fr) minmax(0,1.35fr) minmax(128px,.85fr) 28px;gap:12px}
+.pro-home .weekly-prediction-row{width:100%;min-width:0;box-sizing:border-box;grid-template-columns:minmax(72px,.48fr) minmax(0,1.25fr) minmax(130px,.86fr) 28px;gap:10px}
+.pro-home .feature-row>*,
+.pro-home .weekly-prediction-row>*,
+.pro-home .feature-time,
+.pro-home .feature-teams,
+.pro-home .feature-pick,
+.pro-home .weekly-date,
+.pro-home .weekly-fixture,
+.pro-home .weekly-pick{min-width:0}
+.pro-home .feature-pick b,
+.pro-home .weekly-pick b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pro-home .feature-pick span,
+.pro-home .weekly-pick strong{justify-self:end;white-space:nowrap}
+.pro-home .weekly-pick .premium-badge{width:100%!important;min-width:0;max-width:100%;padding-left:10px!important;padding-right:10px!important}
+.pro-home .row-arrow,
+.pro-home .weekly-arrow{justify-self:end;flex:none}
+
 @media(max-width:640px){
   .top .nav{padding-left:12px;padding-right:10px;gap:8px}
   .top .brand img{width:clamp(138px,42vw,168px)!important;height:36px!important;object-fit:contain}
