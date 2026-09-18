@@ -6,7 +6,7 @@
     <RouterLink v-if="!pick.locked" :to="`/tipster-predictions/${pick._id}`" class="prediction-link" @click.stop><div class="prediction">{{ pick.prediction }}</div></RouterLink>
     <div v-else class="prediction locked-prediction">Selection locked</div>
     <div class="meta">{{ formatDate(pick.createdAt || pick.publishedAt) }} · @{{ pick.tipsterId?.name || 'tipster' }}</div>
-    <div class="tip-bottom" :class="{ 'locked-bottom': pick.locked }"><template v-if="pick.locked"><RouterLink to="/subscription" class="ghost" @click.stop>View plans</RouterLink></template><template v-else><span class="odds">Odds {{ formatOdds(pick.odds) }}</span><button class="btn" @click.stop="handlePlay">{{ auth.isLoggedIn ? 'Play pick' : 'Sign up to play' }}</button></template></div>
+    <div class="tip-bottom" :class="{ 'locked-bottom': pick.locked }"><template v-if="pick.locked"><RouterLink to="/subscription" class="ghost" @click.stop>View plans</RouterLink><button class="share-pick-button" type="button" @click.stop="sharePick">Share</button></template><template v-else><span class="odds">Odds {{ formatOdds(pick.odds) }}</span><div class="tip-actions"><button class="share-pick-button" type="button" @click.stop="sharePick">Share</button><button class="btn" @click.stop="handlePlay">{{ auth.isLoggedIn ? 'Play pick' : 'Sign up to play' }}</button></div></template></div>
     <div v-if="show" class="play-box" @click.stop><b>Add to My Picks</b><p class="muted small">Choose a virtual stake to track your potential return. No payment is taken here.</p><input v-model.number="stake" type="number" min="1" step="1" placeholder="Stake (USD)"/><div class="small" style="margin:8px 0">Potential return: <b>{{ formatMoney(stake * Number(pick.odds || 1)) }}</b></div><div style="display:flex;gap:8px"><button class="btn" :disabled="busy" @click.stop="save"><BrandedLoader v-if="busy" label="Saving…"/><template v-else>Add pick</template></button><button class="ghost" @click.stop="show = false">Cancel</button></div><div v-if="error" class="error" style="margin-top:8px">{{ error }}</div></div>
   </article>
 </template>
@@ -19,15 +19,18 @@ import { useConfirm, useToast } from '../composables/feedback'
 import TeamLogo from './TeamLogo.vue'
 import BrandedLoader from './BrandedLoader.vue'
 import { formatDate, formatMoney, formatOdds } from '../utils/formatters'
+import { shareOrCopy } from '../utils/share'
 const props = defineProps<{pick:any}>()
 const auth = useAuth(), show = ref(false), stake = ref(10), busy = ref(false), error = ref('')
 const { ask } = useConfirm(); const { show: toast } = useToast()
 const fixture = computed(() => props.pick.fixture || 'Upcoming fixture')
+const pickPath = computed(() => `/tipster-predictions/${props.pick._id}`)
 function handlePlay(){if(!auth.isLoggedIn){window.location.href=`/login?redirect=${encodeURIComponent('/picks')}`;return}show.value=true}
+async function sharePick(){try{const selection=props.pick.locked?'Premium tipster pick':props.pick.prediction||'Tipster pick';const odds=!props.pick.locked&&props.pick.odds?` at odds ${formatOdds(props.pick.odds)}`:'';const result=await shareOrCopy({title:`BraTipsters tipster pick: ${selection}`,text:`${fixture.value}: ${selection}${odds}`,url:pickPath.value});if(result==='copied')toast('Share link copied to your clipboard.','success','Share pick')}catch{toast('This pick link could not be shared.','error','Share pick')}}
 async function save(){busy.value=true;error.value='';try{const ok=await ask({title:'Add pick to My Picks?',message:`Track ${props.pick.prediction||'this selection'} at odds ${formatOdds(props.pick.odds)} with a virtual stake of ${formatMoney(stake.value)}. No payment is taken.`,confirmText:'Add pick'});if(!ok){busy.value=false;return}await api.post('/me/picks',{predictionId:props.pick._id,stake:stake.value});show.value=false;await ask({title:'Pick added to My Picks',message:`Your ${props.pick.prediction||'selection'} pick has been added successfully. You can track it from My Picks.`,confirmText:'Done',success:true})}catch(e:any){error.value=e?.message||'Unable to add this pick.';toast(error.value,'error','My Picks')}finally{busy.value=false}}
 </script>
 <style scoped>
-.premium-lock{color:#8b4cf6}.locked-prediction{color:#17243b;font-weight:900;padding:8px 0}.locked-bottom{justify-content:flex-end}.tip-status{display:flex;align-items:center;gap:5px}.fixture-teams{display:flex;align-items:center;justify-content:center;gap:10px;margin:15px 0;font-size:13px}.fixture-teams>div{display:flex;align-items:center;gap:6px;min-width:0}.fixture-teams>div b{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fixture-teams span{color:var(--muted);font-size:11px}.feed-score{font-weight:900;color:#17243b!important;white-space:nowrap}.play-box{margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}.play-box input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;margin:8px 0}
+.premium-lock{color:#8b4cf6}.locked-prediction{color:#17243b;font-weight:900;padding:8px 0}.locked-bottom{justify-content:flex-end;gap:8px}.tip-actions{display:flex;align-items:center;gap:8px}.share-pick-button{border:1px solid #dfe5ed;border-radius:10px;background:#fff;color:#4f5d73;cursor:pointer;font-size:12px;font-weight:900;padding:10px 13px}.share-pick-button:hover{border-color:#ed275f;color:#ed275f}.tip-status{display:flex;align-items:center;gap:5px}.fixture-teams{display:flex;align-items:center;justify-content:center;gap:10px;margin:15px 0;font-size:13px}.fixture-teams>div{display:flex;align-items:center;gap:6px;min-width:0}.fixture-teams>div b{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fixture-teams span{color:var(--muted);font-size:11px}.feed-score{font-weight:900;color:#17243b!important;white-space:nowrap}.play-box{margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}.play-box input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;margin:8px 0}
 @media(max-width:640px){
   .tip-top{align-items:flex-start;gap:8px;flex-wrap:wrap}
   .tip-status{min-width:0;flex-wrap:wrap;justify-content:flex-end}
@@ -36,7 +39,8 @@ async function save(){busy.value=true;error.value='';try{const ok=await ask({tit
   .fixture-teams>div b{max-width:100%;font-size:12px;line-height:1.25}
   .prediction{font-size:20px;line-height:1.2;overflow-wrap:anywhere}
   .tip-bottom{align-items:stretch;gap:10px;flex-direction:column}
-  .tip-bottom .btn,.tip-bottom .ghost{width:100%;text-align:center}
+  .tip-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .tip-bottom .btn,.tip-bottom .ghost,.tip-bottom .share-pick-button{width:100%;text-align:center}
   .play-box div[style]{flex-wrap:wrap}
   .play-box .btn,.play-box .ghost{flex:1 1 120px}
 }
