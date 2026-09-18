@@ -27,3 +27,13 @@ The My Picks feature records a user's selections and stake for tracking; it does
 The public app includes the football home feed, matches, live scores, Match Centre, odds movement, Dropping Odds, Bet of the Day, prediction history, tipsters and Stripe membership entry points.
 
 The favicon is served from `/favicon.svg`.
+
+## BraTipsters social/community links
+Set these Vite variables in `.env.local` (do not commit secrets; these are public links):
+
+VITE_DISCORD_URL=https://discord.gg/YOUR_INVITE
+VITE_FACEBOOK_URL=https://www.facebook.com/YOUR_PAGE
+VITE_TELEGRAM_URL=https://t.me/YOUR_CHANNEL
+VITE_INSTAGRAM_URL=https://www.instagram.com/YOUR_USERNAME
+
+The links are used by the `/community` page and the site footer.
